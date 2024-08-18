@@ -430,8 +430,8 @@ caching. A sample config for apache2 could look like:
     SSLCertificateKeyFile /etc/apache2/ssl/server.key
 
     <Location /bitcoinrpc>
-        ProxyPass http://127.0.0.1:8400/
-        ProxyPassReverse http://127.0.0.1:8400/
+        ProxyPass http://127.0.0.1:8332/
+        ProxyPassReverse http://127.0.0.1:8332/
         # optional enable digest auth
         # AuthType Digest
         # ...

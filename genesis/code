@@ -1,0 +1,7 @@
+(base) traaitt@TRRXITTorporate genesis % python mine_genesis_block.py
+Mining genesis block with difficulty target: 0000
+Genesis Block mined!
+Hash: 0000a95e08d4984c3e944263097ea0062566c916d0f6d71b34a06789ac6c4f5f
+Nonce: 86921
+Timestamp: 1724001017
+{'index': 0, 'previous_hash': '0000000000000000000000000000000000000000000000000000000000000000', 'timestamp': 1724001017, 'data': 'tBTC 18th August 2024', 'nonce': 86921, 'hash': '0000a95e08d4984c3e944263097ea0062566c916d0f6d71b34a06789ac6c4f5f'}

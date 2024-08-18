@@ -3,7 +3,7 @@
 ## Scope
 
 libsecp256k1 is a library for elliptic curve cryptography on the curve secp256k1, not a general-purpose cryptography library.
-The library primarily serves the needs of the Bitcoin Core project but provides additional functionality for the benefit of the wider Bitcoin ecosystem.
+The library primarily serves the needs of the traaittXT Enterprise project but provides additional functionality for the benefit of the wider Bitcoin ecosystem.
 
 ## Adding new functionality or modules
 
@@ -38,7 +38,7 @@ Chat history logs can be found at https://gnusha.org/secp256k1/.
 
 ## Contributor workflow & peer review
 
-The Contributor Workflow & Peer Review in libsecp256k1 are similar to Bitcoin Core's workflow and review processes described in its [CONTRIBUTING.md](https://github.com/bitcoin/bitcoin/blob/master/CONTRIBUTING.md).
+The Contributor Workflow & Peer Review in libsecp256k1 are similar to traaittXT Enterprise's workflow and review processes described in its [CONTRIBUTING.md](https://github.com/bitcoin/bitcoin/blob/master/CONTRIBUTING.md).
 
 ### Coding conventions
 

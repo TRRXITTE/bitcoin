@@ -40,7 +40,7 @@ public:
       @note Source: https://en.bitcoin.it/wiki/Units . Please add only sensible ones
      */
     enum class Unit {
-        BTC,
+        XTEcash,
         mBTC,
         uBTC,
         SAT

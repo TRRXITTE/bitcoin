@@ -2,7 +2,11 @@
 #
 # linearize-hashes.py:  List blocks in a linear, no-fork version of the chain.
 #
+<<<<<<< HEAD
 # Copyright (c) 2013-2022 The traaittXT developers
+=======
+# Copyright (c) 2013-2022 The Bitcoin Core developers
+>>>>>>> parent of 9d00be3a85 (traaittXT Enterprise)
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 #

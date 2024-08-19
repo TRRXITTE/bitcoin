@@ -1,4 +1,4 @@
-// Copyright (c) 2018-2020 The traaittXT Enterprise developers
+// Copyright (c) 2018-2020 The Bitcoin Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -21,10 +21,10 @@
 #define COPYRIGHT_HOLDERS "The %s developers"
 
 /* Copyright holder(s) */
-#define COPYRIGHT_HOLDERS_FINAL "The traaittXT Enterprise developers"
+#define COPYRIGHT_HOLDERS_FINAL "The Bitcoin Core developers"
 
 /* Replacement for %s in copyright holders string */
-#define COPYRIGHT_HOLDERS_SUBSTITUTION "traaittXT Enterprise"
+#define COPYRIGHT_HOLDERS_SUBSTITUTION "Bitcoin Core"
 
 /* Copyright year */
 #define COPYRIGHT_YEAR $
@@ -116,7 +116,7 @@
 #define PACKAGE_BUGREPORT "https://github.com/bitcoin/bitcoin/issues"
 
 /* Define to the full name of this package. */
-#define PACKAGE_NAME "traaittXT Enterprise"
+#define PACKAGE_NAME "Bitcoin Core"
 
 /* Define to the full name and version of this package. */
 #define PACKAGE_STRING $

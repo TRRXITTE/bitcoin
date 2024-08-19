@@ -1,4 +1,4 @@
-traaittXT Enterprise version 0.18.1 is now available from:
+Bitcoin Core version 0.18.1 is now available from:
 
   <https://bitcoincore.org/bin/bitcoin-core-0.18.1/>
 
@@ -35,16 +35,16 @@ wallet versions are still supported.
 Compatibility
 ==============
 
-traaittXT Enterprise is supported and extensively tested on operating systems
+Bitcoin Core is supported and extensively tested on operating systems
 using the Linux kernel, macOS 10.10+, and Windows 7 and newer. It is not
-recommended to use traaittXT Enterprise on unsupported systems.
+recommended to use Bitcoin Core on unsupported systems.
 
-traaittXT Enterprise should also work on most other Unix-like systems but is not
+Bitcoin Core should also work on most other Unix-like systems but is not
 as frequently tested on them.
 
 From 0.17.0 onwards, macOS <10.10 is no longer supported. 0.17.0 is
 built using Qt 5.9.x, which doesn't support versions of macOS older than
-10.10. Additionally, traaittXT Enterprise does not yet change appearance when
+10.10. Additionally, Bitcoin Core does not yet change appearance when
 macOS "dark mode" is activated.
 
 Known issues

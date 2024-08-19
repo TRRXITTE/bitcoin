@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 #
+<<<<<<< HEAD
 # Copyright (c) 2017-2021 The traaittXT developers
+=======
+# Copyright (c) 2017-2021 The Bitcoin Core developers
+>>>>>>> parent of 9d00be3a85 (traaittXT Enterprise)
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 

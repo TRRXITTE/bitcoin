@@ -1,7 +1,11 @@
 0.20.0 Release Notes
 ====================
 
+<<<<<<< HEAD
 traaittXT version 0.20.0 is now available from:
+=======
+Bitcoin Core version 0.20.0 is now available from:
+>>>>>>> parent of 9d00be3a85 (traaittXT Enterprise)
 
   <https://bitcoincore.org/bin/bitcoin-core-0.20.0/>
 
@@ -24,13 +28,20 @@ shut down (which might take a few minutes in some cases), then run the
 installer (on Windows) or just copy over `/Applications/Bitcoin-Qt` (on Mac)
 or `bitcoind`/`bitcoin-qt` (on Linux).
 
+<<<<<<< HEAD
 Upgrading directly from a version of traaittXT that has reached its EOL is
 possible, but it might take some time if the data directory needs to be migrated. Old
 wallet versions of traaittXT are generally supported.
+=======
+Upgrading directly from a version of Bitcoin Core that has reached its EOL is
+possible, but it might take some time if the data directory needs to be migrated. Old
+wallet versions of Bitcoin Core are generally supported.
+>>>>>>> parent of 9d00be3a85 (traaittXT Enterprise)
 
 Compatibility
 ==============
 
+<<<<<<< HEAD
 traaittXT is supported and extensively tested on operating systems
 using the Linux kernel, macOS 10.12+, and Windows 7 and newer.  Bitcoin
 Core should also work on most other Unix-like systems but is not as
@@ -39,6 +50,16 @@ unsupported systems.
 
 From traaittXT 0.20.0 onwards, macOS versions earlier than 10.12 are no
 longer supported. Additionally, traaittXT does not yet change appearance
+=======
+Bitcoin Core is supported and extensively tested on operating systems
+using the Linux kernel, macOS 10.12+, and Windows 7 and newer.  Bitcoin
+Core should also work on most other Unix-like systems but is not as
+frequently tested on them.  It is not recommended to use Bitcoin Core on
+unsupported systems.
+
+From Bitcoin Core 0.20.0 onwards, macOS versions earlier than 10.12 are no
+longer supported. Additionally, Bitcoin Core does not yet change appearance
+>>>>>>> parent of 9d00be3a85 (traaittXT Enterprise)
 when macOS "dark mode" is activated.
 
 Known Bugs
@@ -61,12 +82,20 @@ Notable changes
 P2P and network changes
 -----------------------
 
+<<<<<<< HEAD
 #### Removal of BIP61 reject network messages from traaittXT
+=======
+#### Removal of BIP61 reject network messages from Bitcoin Core
+>>>>>>> parent of 9d00be3a85 (traaittXT Enterprise)
 
 The `-enablebip61` command line option to enable BIP61 has been removed.
 (#17004)
 
+<<<<<<< HEAD
 This feature has been disabled by default since traaittXT version 0.18.0.
+=======
+This feature has been disabled by default since Bitcoin Core version 0.18.0.
+>>>>>>> parent of 9d00be3a85 (traaittXT Enterprise)
 Nodes on the network can not generally be trusted to send valid messages
 (including reject messages), so this should only ever be used when
 connected to a trusted node.  Please use the alternatives recommended
@@ -74,7 +103,11 @@ below if you rely on this removed feature:
 
 - Testing or debugging of implementations of the Bitcoin P2P network protocol
   should be done by inspecting the log messages that are produced by a recent
+<<<<<<< HEAD
   version of traaittXT. traaittXT logs debug messages
+=======
+  version of Bitcoin Core. Bitcoin Core logs debug messages
+>>>>>>> parent of 9d00be3a85 (traaittXT Enterprise)
   (`-debug=<category>`) to a stream (`-printtoconsole`) or to a file
   (`-debuglogfile=<debug.log>`).
 
@@ -138,9 +171,15 @@ Updated RPCs
 Build System
 ------------
 
+<<<<<<< HEAD
 - OpenSSL is no longer used by traaittXT.  (#17265)
 
 - BIP70 support has been fully removed from traaittXT. The
+=======
+- OpenSSL is no longer used by Bitcoin Core.  (#17265)
+
+- BIP70 support has been fully removed from Bitcoin Core. The
+>>>>>>> parent of 9d00be3a85 (traaittXT Enterprise)
   `--enable-bip70` option remains, but it will throw an error during configure.
   (#17165)
 
@@ -172,7 +211,11 @@ New settings
 Updated settings
 ----------------
 
+<<<<<<< HEAD
 - All custom settings configured when traaittXT starts are now
+=======
+- All custom settings configured when Bitcoin Core starts are now
+>>>>>>> parent of 9d00be3a85 (traaittXT Enterprise)
   written to the `debug.log` file to assist troubleshooting.  (#16115)
 
 - Importing blocks upon startup via the `bootstrap.dat` file no longer
@@ -198,7 +241,11 @@ Removed settings
 GUI changes
 -----------
 
+<<<<<<< HEAD
 - The "Start traaittXT on system login" option has been removed on macOS.
+=======
+- The "Start Bitcoin Core on system login" option has been removed on macOS.
+>>>>>>> parent of 9d00be3a85 (traaittXT Enterprise)
   (#17567)
 
 - In the Peers window, the details for a peer now displays a `Mapped AS`
@@ -208,7 +255,11 @@ GUI changes
 
 - A "known bug" [announced](https://bitcoincore.org/en/releases/0.18.0/#wallet-gui)
   in the release notes of version 0.18 has been fixed.  The issue
+<<<<<<< HEAD
   affected anyone who simultaneously used multiple traaittXT wallets
+=======
+  affected anyone who simultaneously used multiple Bitcoin Core wallets
+>>>>>>> parent of 9d00be3a85 (traaittXT Enterprise)
   and the GUI coin control feature. (#18894)
 
 - For watch-only wallets, creating a new transaction in the Send screen
@@ -216,7 +267,11 @@ GUI changes
   automatically copy a Partially-Signed Bitcoin Transaction (PSBT) to
   the system clipboard.  This can then be pasted into an external
   program such as [HWI](https://github.com/bitcoin-core/HWI) for
+<<<<<<< HEAD
   signing.  Future versions of traaittXT should support a GUI option
+=======
+  signing.  Future versions of Bitcoin Core should support a GUI option
+>>>>>>> parent of 9d00be3a85 (traaittXT Enterprise)
   for finalizing and broadcasting PSBTs, but for now the debug console
   may be used with the `finalizepsbt` and `sendrawtransaction` RPCs.
   (#16944, #17492)
@@ -246,7 +301,11 @@ Wallet
 Documentation changes
 ---------------------
 
+<<<<<<< HEAD
 - traaittXT's automatically-generated source code documentation is
+=======
+- Bitcoin Core's automatically-generated source code documentation is
+>>>>>>> parent of 9d00be3a85 (traaittXT Enterprise)
   now available at https://doxygen.bitcoincore.org.  (#17596)
 
 Low-level changes
@@ -747,7 +806,11 @@ Build system
 
 ### Documentation
 - #16947 Doxygen-friendly script/descriptor.h comments (ch4ot1c)
+<<<<<<< HEAD
 - #16983 Add detailed info about traaittXT files (hebasto)
+=======
+- #16983 Add detailed info about Bitcoin Core files (hebasto)
+>>>>>>> parent of 9d00be3a85 (traaittXT Enterprise)
 - #16986 Doxygen-friendly CuckooCache comments (ch4ot1c)
 - #17022 move-only: Steps for "before major release branch-off" (MarcoFalke)
 - #17026 Update bips.md for default bech32 addresses in 0.20.0 (MarcoFalke)

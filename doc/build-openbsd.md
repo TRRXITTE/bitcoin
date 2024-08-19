@@ -18,7 +18,7 @@ pkg_add autoconf automake python
 See [dependencies.md](dependencies.md) for a complete overview.
 
 ### 2. Clone Bitcoin Repo
-Clone the traaittXT Enterprise repository to a directory. All build scripts and commands will run from this directory.
+Clone the Bitcoin Core repository to a directory. All build scripts and commands will run from this directory.
 ``` bash
 git clone https://github.com/bitcoin/bitcoin.git
 ```
@@ -60,13 +60,13 @@ export BDB_PREFIX="/path/to/bitcoin/depends/x86_64-unknown-openbsd"
 #### GUI Dependencies
 ###### Qt5
 
-traaittXT Enterprise includes a GUI built with the cross-platform Qt Framework. To compile the GUI, Qt 5 is required.
+Bitcoin Core includes a GUI built with the cross-platform Qt Framework. To compile the GUI, Qt 5 is required.
 
 ```bash
 pkg_add qt5
 ```
 
-## Building traaittXT Enterprise
+## Building Bitcoin Core
 
 **Important**: Use `gmake` (the non-GNU `make` will exit with an error).
 
@@ -82,7 +82,7 @@ export AUTOMAKE_VERSION=1.16
 
 ### 1. Configuration
 
-There are many ways to configure traaittXT Enterprise, here are a few common examples:
+There are many ways to configure Bitcoin Core, here are a few common examples:
 
 ##### Descriptor Wallet and GUI:
 This enables the GUI and descriptor wallet support, assuming `sqlite` and `qt5` are installed.

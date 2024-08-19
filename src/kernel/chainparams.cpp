@@ -1,5 +1,5 @@
 // Copyright (c) 2010 Satoshi Nakamoto
-// Copyright (c) 2009-2021 The traaittXT Enterprise developers
+// Copyright (c) 2009-2021 The traaittXT developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -116,7 +116,7 @@ public:
         pchMessageStart[1] = 0xbe;
         pchMessageStart[2] = 0xb4;
         pchMessageStart[3] = 0xd9;
-        nDefaultPort = 8100;
+        nDefaultPort = 8500;
         nPruneAfterHeight = 100000;
         m_assumed_blockchain_size = 15;
         m_assumed_chain_state_size = 10;

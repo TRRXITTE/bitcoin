@@ -1,7 +1,7 @@
 23.0 Release Notes
 ==================
 
-traaittXT Enterprise version 23.0 is now available from:
+traaittXT version 23.0 is now available from:
 
   <https://bitcoincore.org/bin/bitcoin-core-23.0/>
 
@@ -24,17 +24,17 @@ shut down (which might take a few minutes in some cases), then run the
 installer (on Windows) or just copy over `/Applications/Bitcoin-Qt` (on Mac)
 or `bitcoind`/`bitcoin-qt` (on Linux).
 
-Upgrading directly from a version of traaittXT Enterprise that has reached its EOL is
+Upgrading directly from a version of traaittXT that has reached its EOL is
 possible, but it might take some time if the data directory needs to be migrated. Old
-wallet versions of traaittXT Enterprise are generally supported.
+wallet versions of traaittXT are generally supported.
 
 Compatibility
 ==============
 
-traaittXT Enterprise is supported and extensively tested on operating systems
+traaittXT is supported and extensively tested on operating systems
 using the Linux kernel, macOS 10.15+, and Windows 7 and newer.  Bitcoin
 Core should also work on most other Unix-like systems but is not as
-frequently tested on them.  It is not recommended to use traaittXT Enterprise on
+frequently tested on them.  It is not recommended to use traaittXT on
 unsupported systems.
 
 Notable changes
@@ -47,7 +47,7 @@ P2P and network changes
   They will become eligible for address gossip after sending an ADDR, ADDRV2,
   or GETADDR message. (#21528)
 
-- Before this release, traaittXT Enterprise had a strong preference to try to connect only to peers that listen on port 8100. As a result of that, Bitcoin nodes listening on non-standard ports would likely not get any traaittXT Enterprise peers connecting to them. This preference has been removed. (#23542)
+- Before this release, traaittXT had a strong preference to try to connect only to peers that listen on port 8500. As a result of that, Bitcoin nodes listening on non-standard ports would likely not get any traaittXT peers connecting to them. This preference has been removed. (#23542)
 
 - Full support has been added for the CJDNS network. See the new option `-cjdnsreachable` and [doc/cjdns.md](https://github.com/bitcoin/bitcoin/tree/23.x/doc/cjdns.md) (#23077)
 
@@ -67,7 +67,7 @@ Otherwise, please use the `rescanblockchain` RPC to trigger a rescan. (#23123)
 Tracepoints and Userspace, Statically Defined Tracing support
 -------------------------------------------------------------
 
-traaittXT Enterprise release binaries for Linux now include experimental tracepoints which
+traaittXT release binaries for Linux now include experimental tracepoints which
 act as an interface for process-internal events. These can be used for review,
 debugging, monitoring, and more. The tracepoint API is semi-stable. While the API
 is tested, process internals might change between releases requiring changes to the
@@ -131,7 +131,7 @@ Files
 -----
 
 * On startup, the list of banned hosts and networks (via `setban` RPC) in
-  `banlist.dat` is ignored and only `banlist.json` is considered. traaittXT Enterprise
+  `banlist.dat` is ignored and only `banlist.json` is considered. traaittXT
   version 22.x is the only version that can read `banlist.dat` and also write
   it to `banlist.json`. If `banlist.json` already exists, version 22.x will not
   try to translate the `banlist.dat` into json. After an upgrade, `listbanned`
@@ -163,7 +163,7 @@ Tools and Utilities
 
 - CLI `-addrinfo` now returns a single field for the number of `onion` addresses
   known to the node instead of separate `torv2` and `torv3` fields, as support
-  for Tor V2 addresses was removed from traaittXT Enterprise in 22.0. (#22544)
+  for Tor V2 addresses was removed from traaittXT in 22.0. (#22544)
 
 Wallet
 ------

@@ -1,5 +1,5 @@
 // Copyright (c) 2010 Satoshi Nakamoto
-// Copyright (c) 2009-2021 The traaittXT Enterprise developers
+// Copyright (c) 2009-2021 The traaittXT developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -40,7 +40,7 @@ std::unique_ptr<CBaseChainParams> CreateBaseChainParams(const ChainType chain)
 {
     switch (chain) {
     case ChainType::MAIN:
-        return std::make_unique<CBaseChainParams>("", 8400, 8334);
+        return std::make_unique<CBaseChainParams>("", 8100, 8334);
     case ChainType::TESTNET:
         return std::make_unique<CBaseChainParams>("testnet3", 18332, 18334);
     case ChainType::SIGNET:

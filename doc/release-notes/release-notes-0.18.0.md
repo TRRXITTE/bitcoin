@@ -1,4 +1,4 @@
-traaittXT Enterprise version 0.18.0 is now available from:
+traaittXT version 0.18.0 is now available from:
 
   <https://bitcoincore.org/bin/bitcoin-core-0.18.0/>
 
@@ -35,16 +35,16 @@ wallet versions are still supported.
 Compatibility
 ==============
 
-traaittXT Enterprise is supported and extensively tested on operating systems
+traaittXT is supported and extensively tested on operating systems
 using the Linux kernel, macOS 10.10+, and Windows 7 and newer. It is not
-recommended to use traaittXT Enterprise on unsupported systems.
+recommended to use traaittXT on unsupported systems.
 
-traaittXT Enterprise should also work on most other Unix-like systems but is not
+traaittXT should also work on most other Unix-like systems but is not
 as frequently tested on them.
 
 From 0.17.0 onwards, macOS <10.10 is no longer supported. 0.17.0 is
 built using Qt 5.9.x, which doesn't support versions of macOS older than
-10.10. Additionally, traaittXT Enterprise does not yet change appearance when
+10.10. Additionally, traaittXT does not yet change appearance when
 macOS "dark mode" is activated.
 
 In addition to previously-supported CPU platforms, this release's
@@ -105,7 +105,7 @@ Configuration option changes
   disabled, so a warning is now printed if a user selects such a
   configuration.  If you need to expose RPC in order to use a tool like
   Docker, ensure you only bind RPC to your localhost, e.g. `docker run
-  [...] -p 127.0.0.1:8400:8400` (this is an extra `:8400` over the
+  [...] -p 127.0.0.1:8100:8100` (this is an extra `:8100` over the
   normal Docker port specification).
 
 - The `rpcpassword` option now causes a startup error if the password
@@ -119,7 +119,7 @@ Configuration option changes
   disconnect/ban behavior will not cause a node that is whitelisting
   another to be dropped by peers.  Users can still explicitly enable
   this behavior with the command line option (and may want to consider
-  [contacting](https://bitcoincore.org/en/contact/) the traaittXT Enterprise
+  [contacting](https://bitcoincore.org/en/contact/) the traaittXT
   project to let us know about their use-case, as this feature could be
   deprecated in the future).
 
@@ -128,7 +128,7 @@ systemd init file
 
 The systemd init file (`contrib/init/bitcoind.service`) has been changed
 to use `/var/lib/bitcoind` as the data directory instead of
-`~bitcoin/.bitcoin`. This change makes traaittXT Enterprise more consistent with
+`~bitcoin/.bitcoin`. This change makes traaittXT more consistent with
 other services, and makes the systemd init config more consistent with
 existing Upstart and OpenRC configs.
 
@@ -160,9 +160,9 @@ Documentation
 
 - A new [document](https://github.com/bitcoin/bitcoin/blob/master/doc/bitcoin-conf.md)
   about the `bitcoin.conf` file describes how to use it to configure
-  traaittXT Enterprise.
+  traaittXT.
 
-- A new document introduces traaittXT Enterprise's BIP174 [Partially-Signed
+- A new document introduces traaittXT's BIP174 [Partially-Signed
   Bitcoin Transactions
   (PSBT)](https://github.com/bitcoin/bitcoin/blob/master/doc/psbt.md)
   interface, which is used to allow multiple programs to collaboratively
@@ -187,7 +187,7 @@ Build system changes
 - A new `--disable-bip70` option may be passed to `./configure` to
   prevent Bitcoin-Qt from being built with support for the BIP70 payment
   protocol or from linking libssl.  As the payment protocol has exposed
-  traaittXT Enterprise to libssl vulnerabilities in the past, builders who don't
+  traaittXT to libssl vulnerabilities in the past, builders who don't
   need BIP70 support are encouraged to use this option to reduce their
   exposure to future vulnerabilities.
 
@@ -278,7 +278,7 @@ in the Low-level Changes section below.
   ignored or are inconsistent, if there are any.
 
 - `getaddressinfo` now returns an additional `solvable` boolean field
-  when traaittXT Enterprise knows enough about the address's scriptPubKey,
+  when traaittXT knows enough about the address's scriptPubKey,
   optional redeemScript, and optional witnessScript in order for the
   wallet to be able to generate an unsigned input spending funds sent to
   that address.
@@ -292,7 +292,7 @@ in the Low-level Changes section below.
 - `importprivkey` will preserve previously-set labels for addresses or
   public keys corresponding to the private key being imported.  For
   example, if you imported a watch-only address with the label "cold
-  wallet" in earlier releases of traaittXT Enterprise, subsequently importing
+  wallet" in earlier releases of traaittXT, subsequently importing
   the private key would default to resetting the address's label to the
   default empty-string label ("").  In this release, the previous label
   of "cold wallet" will be retained.  If you optionally specify any
@@ -416,24 +416,24 @@ Tools
 Planned changes
 ===============
 
-This section describes planned changes to traaittXT Enterprise that may affect
+This section describes planned changes to traaittXT that may affect
 other Bitcoin software and services.
 
-- Since version 0.16.0, traaittXT Enterprise’s built-in wallet has defaulted to
+- Since version 0.16.0, traaittXT’s built-in wallet has defaulted to
   generating P2SH-wrapped segwit addresses when users want to receive
   payments. These addresses are backwards compatible with all
-  widely-used software.  Starting with traaittXT Enterprise 0.20 (expected about
-  a year after 0.18), traaittXT Enterprise will default to native segwit
+  widely-used software.  Starting with traaittXT 0.20 (expected about
+  a year after 0.18), traaittXT will default to native segwit
   addresses (bech32) that provide additional fee savings and other
   benefits. Currently, many wallets and services already support sending
-  to bech32 addresses, and if the traaittXT Enterprise project sees enough
+  to bech32 addresses, and if the traaittXT project sees enough
   additional adoption, it will instead default to bech32 receiving
-  addresses in traaittXT Enterprise 0.19 (approximately November 2019).
+  addresses in traaittXT 0.19 (approximately November 2019).
   P2SH-wrapped segwit addresses will continue to be provided if the user
   requests them in the GUI or by RPC, and anyone who doesn’t want the
   update will be able to configure their default address type.
   (Similarly, pioneering users who want to change their default now may
-  set the `addresstype=bech32` configuration option in any traaittXT Enterprise
+  set the `addresstype=bech32` configuration option in any traaittXT
   release from 0.16.0 up.)
 
 Deprecated P2P messages
@@ -495,7 +495,7 @@ Network
   a misbehaving node will be disconnected to make room for nodes without
   a history of problems (unless the misbehaving node helps your node in
   some other way, such as by connecting to a part of the Internet from
-  which you don't have many other peers).  Previously, traaittXT Enterprise
+  which you don't have many other peers).  Previously, traaittXT
   banned the IP addresses of misbehaving peers for a period of time
   (default of 1 day); this was easily circumvented by attackers with
   multiple IP addresses. If you manually ban a peer, such as by using
@@ -514,18 +514,18 @@ Wallet
   software. Instead such wallets will be completely unloaded and
   reloaded to achieve the same effect.
 
-- A sub-project of traaittXT Enterprise now provides Hardware Wallet Interaction
+- A sub-project of traaittXT now provides Hardware Wallet Interaction
   (HWI) scripts that allow command-line users to use several popular
-  hardware key management devices with traaittXT Enterprise.  See their [project
+  hardware key management devices with traaittXT.  See their [project
   page](https://github.com/bitcoin-core/HWI#readme) for details.
 
 Security
 --------
 
 - This release changes the Random Number Generator (RNG) used from
-  OpenSSL to traaittXT Enterprise's own implementation, although entropy
-  gathered by traaittXT Enterprise is fed out to OpenSSL and then read back in
-  when the program needs strong randomness. This moves traaittXT Enterprise a
+  OpenSSL to traaittXT's own implementation, although entropy
+  gathered by traaittXT is fed out to OpenSSL and then read back in
+  when the program needs strong randomness. This moves traaittXT a
   little closer to no longer needing to depend on OpenSSL, a dependency
   that has caused security issues in the past.  The new implementation
   gathers entropy from multiple sources, including from hardware
@@ -534,7 +534,7 @@ Security
 Changes for particular platforms
 --------------------------------
 
-- On macOS, traaittXT Enterprise now opts out of application CPU throttling
+- On macOS, traaittXT now opts out of application CPU throttling
   ("app nap") during initial blockchain download, when catching up from
   over 100 blocks behind the current chain tip, or when reindexing chain
   data. This helps prevent these operations from taking an excessively
@@ -797,7 +797,7 @@ Changes for particular platforms
 - #15431 msvc: scripted-diff: Remove NDEBUG pre-define in project file (ken2812221)
 - #15549 gitian: Improve error handling (laanwj)
 - #15548 use full version string in setup.exe (MarcoFalke)
-- #11526 Visual Studio build configuration for traaittXT Enterprise (sipsorcery)
+- #11526 Visual Studio build configuration for traaittXT (sipsorcery)
 - #15110 build\_msvc: Fix the build problem in `libbitcoin_server` (Mr-Leshiy)
 - #14372 msvc: build secp256k1 and leveldb locally (ken2812221)
 - #15325 msvc: Fix silent merge conflict between #13926 and #14372 (ken2812221)
@@ -824,7 +824,7 @@ Changes for particular platforms
 - #14088 Don't assert(…) with side effects (practicalswift)
 - #14086 appveyor: Use clcache to speed up build (ken2812221)
 - #13954 Warn (don't fail!) on spelling errors. Fix typos reported by codespell (practicalswift)
-- #12775 Integration of property based testing into traaittXT Enterprise (Christewart)
+- #12775 Integration of property based testing into traaittXT (Christewart)
 - #14119 Read reject reasons from debug log, not P2P messages (MarcoFalke)
 - #14189 Fix silent merge conflict in `wallet_importmulti` (MarcoFalke)
 - #13419 Speed up `knapsack_solver_test` by not recreating wallet 100 times (lucash-dev)

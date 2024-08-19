@@ -2,7 +2,7 @@
 #
 # linearize-hashes.py:  List blocks in a linear, no-fork version of the chain.
 #
-# Copyright (c) 2013-2022 The traaittXT Enterprise developers
+# Copyright (c) 2013-2022 The traaittXT developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 #
@@ -114,7 +114,7 @@ if __name__ == '__main__':
     if 'host' not in settings:
         settings['host'] = '127.0.0.1'
     if 'port' not in settings:
-        settings['port'] = 8400
+        settings['port'] = 8100
     if 'min_height' not in settings:
         settings['min_height'] = 0
     if 'max_height' not in settings:

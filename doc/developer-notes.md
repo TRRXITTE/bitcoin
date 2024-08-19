@@ -26,11 +26,7 @@ Developer Notes
     - [Threads](#threads)
     - [Ignoring IDE/editor files](#ignoring-ideeditor-files)
 - [Development guidelines](#development-guidelines)
-<<<<<<< HEAD
     - [General traaittXT](#general-bitcoin-core)
-=======
-    - [General Bitcoin Core](#general-bitcoin-core)
->>>>>>> parent of 9d00be3a85 (traaittXT Enterprise)
     - [Wallet](#wallet)
     - [General C++](#general-c)
     - [C++ data structures](#c-data-structures)
@@ -250,11 +246,7 @@ Refer to [/test/functional/README.md#style-guidelines](/test/functional/README.m
 Coding Style (Doxygen-compatible comments)
 ------------------------------------------
 
-<<<<<<< HEAD
 traaittXT uses [Doxygen](https://www.doxygen.nl/) to generate its official documentation.
-=======
-Bitcoin Core uses [Doxygen](https://www.doxygen.nl/) to generate its official documentation.
->>>>>>> parent of 9d00be3a85 (traaittXT Enterprise)
 
 Use Doxygen-compatible comment blocks for functions, methods, and fields.
 
@@ -421,11 +413,7 @@ see [test/functional/](/test/functional) for tests that run in `-regtest` mode.
 
 ### DEBUG_LOCKORDER
 
-<<<<<<< HEAD
 traaittXT is a multi-threaded application, and deadlocks or other
-=======
-Bitcoin Core is a multi-threaded application, and deadlocks or other
->>>>>>> parent of 9d00be3a85 (traaittXT Enterprise)
 multi-threading bugs can be very difficult to track down. The `--enable-debug`
 configure option adds `-DDEBUG_LOCKORDER` to the compiler flags. This inserts
 run-time checks to keep track of which locks are held and adds warnings to the
@@ -553,11 +541,7 @@ See the functional test documentation for how to invoke perf within tests.
 
 ### Sanitizers
 
-<<<<<<< HEAD
 traaittXT can be compiled with various "sanitizers" enabled, which add
-=======
-Bitcoin Core can be compiled with various "sanitizers" enabled, which add
->>>>>>> parent of 9d00be3a85 (traaittXT Enterprise)
 instrumentation for issues regarding things like memory safety, thread race
 conditions, or undefined behavior. This is controlled with the
 `--with-sanitizers` configure flag, which should be a comma separated list of
@@ -687,11 +671,7 @@ Ignoring IDE/editor files
 In closed-source environments in which everyone uses the same IDE, it is common
 to add temporary files it produces to the project-wide `.gitignore` file.
 
-<<<<<<< HEAD
 However, in open source software such as traaittXT, where everyone uses
-=======
-However, in open source software such as Bitcoin Core, where everyone uses
->>>>>>> parent of 9d00be3a85 (traaittXT Enterprise)
 their own editors/IDE/tools, it is less common. Only you know what files your
 editor produces and this may change from version to version. The canonical way
 to do this is thus to create your local gitignore. Add this to `~/.gitconfig`:
@@ -721,15 +701,9 @@ Development guidelines
 ============================
 
 A few non-style-related recommendations for developers, as well as points to
-<<<<<<< HEAD
 pay attention to for reviewers of traaittXT code.
 
 General traaittXT
-=======
-pay attention to for reviewers of Bitcoin Core code.
-
-General Bitcoin Core
->>>>>>> parent of 9d00be3a85 (traaittXT Enterprise)
 ----------------------
 
 - New features should be exposed on RPC first, then can be made available in the GUI.
@@ -951,11 +925,7 @@ Strings and formatting
 
 - For `strprintf`, `LogInfo`, `LogDebug`, etc formatting characters don't need size specifiers.
 
-<<<<<<< HEAD
   - *Rationale*: traaittXT uses tinyformat, which is type safe. Leave them out to avoid confusion.
-=======
-  - *Rationale*: Bitcoin Core uses tinyformat, which is type safe. Leave them out to avoid confusion.
->>>>>>> parent of 9d00be3a85 (traaittXT Enterprise)
 
 - Use `.c_str()` sparingly. Its only valid use is to pass C++ strings to C functions that take NULL-terminated
   strings.
@@ -1212,21 +1182,13 @@ Subtrees
 
 Several parts of the repository are subtrees of software maintained elsewhere.
 
-<<<<<<< HEAD
 Some of these are maintained by active developers of traaittXT, in which case
-=======
-Some of these are maintained by active developers of Bitcoin Core, in which case
->>>>>>> parent of 9d00be3a85 (traaittXT Enterprise)
 changes should go directly upstream without being PRed directly against the project.
 They will be merged back in the next subtree merge.
 
 Others are external projects without a tight relationship with our project. Changes
 to these should also be sent upstream, but bugfixes may also be prudent to PR against
-<<<<<<< HEAD
 a traaittXT subtree, so that they can be integrated quickly. Cosmetic changes
-=======
-a Bitcoin Core subtree, so that they can be integrated quickly. Cosmetic changes
->>>>>>> parent of 9d00be3a85 (traaittXT Enterprise)
 should be taken upstream.
 
 There is a tool in `test/lint/git-subtree-check.sh` ([instructions](../test/lint#git-subtree-checksh))
@@ -1450,11 +1412,7 @@ A few guidelines for introducing and reviewing new RPC interfaces:
   RPCs whose behavior does *not* depend on the current chainstate may omit this
   call.
 
-<<<<<<< HEAD
   - *Rationale*: In previous versions of traaittXT, the wallet was always
-=======
-  - *Rationale*: In previous versions of Bitcoin Core, the wallet was always
->>>>>>> parent of 9d00be3a85 (traaittXT Enterprise)
     in-sync with the chainstate (by virtue of them all being updated in the
     same cs_main lock). In order to maintain the behavior that wallet RPCs
     return results as of at least the highest best-known block an RPC

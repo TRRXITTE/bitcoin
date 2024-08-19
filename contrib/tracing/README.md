@@ -2,13 +2,8 @@ Example scripts for User-space, Statically Defined Tracing (USDT)
 =================================================================
 
 This directory contains scripts showcasing User-space, Statically Defined
-<<<<<<< HEAD
 Tracing (USDT) support for traaittXT on Linux using. For more information on
 USDT support in traaittXT see the [USDT documentation].
-=======
-Tracing (USDT) support for Bitcoin Core on Linux using. For more information on
-USDT support in Bitcoin Core see the [USDT documentation].
->>>>>>> parent of 9d00be3a85 (traaittXT Enterprise)
 
 [USDT documentation]: ../../doc/tracing.md
 
@@ -39,17 +34,10 @@ The bpftrace examples contain a relative path to the `bitcoind` binary. By
 default, the scripts should be run from the repository-root and assume a
 self-compiled `bitcoind` binary. The paths in the examples can be changed, for
 example, to point to release builds if needed. See the
-<<<<<<< HEAD
 [traaittXT USDT documentation] on how to list available tracepoints in your
 `bitcoind` binary.
 
 [traaittXT USDT documentation]: ../../doc/tracing.md#listing-available-tracepoints
-=======
-[Bitcoin Core USDT documentation] on how to list available tracepoints in your
-`bitcoind` binary.
-
-[Bitcoin Core USDT documentation]: ../../doc/tracing.md#listing-available-tracepoints
->>>>>>> parent of 9d00be3a85 (traaittXT Enterprise)
 
 **WARNING: eBPF programs require root privileges to be loaded into a Linux
 kernel VM. This means the bpftrace and BCC examples must be executed with root
@@ -196,11 +184,7 @@ longer than 25ms to connect.
 $ bpftrace contrib/tracing/connectblock_benchmark.bt 20000 38000 25
 ```
 
-<<<<<<< HEAD
 In a different terminal, starting traaittXT in SigNet mode and with
-=======
-In a different terminal, starting Bitcoin Core in SigNet mode and with
->>>>>>> parent of 9d00be3a85 (traaittXT Enterprise)
 re-indexing enabled.
 
 ```

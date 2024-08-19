@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 traaittXT version 0.13.1 is now available from:
-=======
-Bitcoin Core version 0.13.1 is now available from:
->>>>>>> parent of 9d00be3a85 (traaittXT Enterprise)
 
   <https://bitcoin.org/bin/bitcoin-core-0.13.1/>
 
@@ -26,11 +22,7 @@ an OS initially released in 2001. This means that not even critical security
 updates will be released anymore. Without security updates, using a bitcoin
 wallet on a XP machine is irresponsible at least.
 
-<<<<<<< HEAD
 In addition to that, with 0.12.x there have been varied reports of traaittXT
-=======
-In addition to that, with 0.12.x there have been varied reports of Bitcoin Core
->>>>>>> parent of 9d00be3a85 (traaittXT Enterprise)
 randomly crashing on Windows XP. It is [not clear](https://github.com/bitcoin/bitcoin/issues/7681#issuecomment-217439891)
 what the source of these crashes is, but it is likely that upstream
 libraries such as Qt are no longer being tested on XP.
@@ -139,21 +131,13 @@ covered by the txid. This provides several immediate benefits:
   (specifically, the segregated witnesses) while still ensuring that the node
   can build an accurate copy of the UTXO set for the block chain with the most
   proof of work.  Segwit enables this capability at the consensus layer, but
-<<<<<<< HEAD
   note that traaittXT does not provide an option to use this capability as
-=======
-  note that Bitcoin Core does not provide an option to use this capability as
->>>>>>> parent of 9d00be3a85 (traaittXT Enterprise)
   of this 0.13.1 release.
 
 - **Script versioning:** Segwit makes it easy for future soft forks to allow
   Bitcoin users to individually opt-in to almost any change in the Bitcoin
   Script language when those users receive new transactions.  Features
-<<<<<<< HEAD
   currently being researched by traaittXT contributors that may use this
-=======
-  currently being researched by Bitcoin Core contributors that may use this
->>>>>>> parent of 9d00be3a85 (traaittXT Enterprise)
   capability include support for Schnorr signatures, which can improve the
   privacy and efficiency of multisig transactions (or transactions with
   multiple inputs), and Merklized Abstract Syntax Trees (MAST), which can
@@ -199,11 +183,7 @@ a third-party to insert data into other people's transactions, changing
 the transaction's txid (called transaction malleability) and possibly
 causing other problems.
 
-<<<<<<< HEAD
 Since traaittXT 0.10.0, nodes have defaulted to only relaying and
-=======
-Since Bitcoin Core 0.10.0, nodes have defaulted to only relaying and
->>>>>>> parent of 9d00be3a85 (traaittXT Enterprise)
 mining transactions whose dummy element was a null value (0x00, also
 called OP_0).  The null dummy soft fork turns this relay rule into a
 consensus rule both for non-segwit transactions and segwit transactions,

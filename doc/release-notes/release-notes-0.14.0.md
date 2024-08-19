@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 traaittXT version 0.14.0 is now available from:
-=======
-Bitcoin Core version 0.14.0 is now available from:
->>>>>>> parent of 9d00be3a85 (traaittXT Enterprise)
 
   <https://bitcoin.org/bin/bitcoin-core-0.14.0/>
 
@@ -20,11 +16,7 @@ To receive security and update notifications, please subscribe to:
 Compatibility
 ==============
 
-<<<<<<< HEAD
 traaittXT is extensively tested on multiple operating systems using
-=======
-Bitcoin Core is extensively tested on multiple operating systems using
->>>>>>> parent of 9d00be3a85 (traaittXT Enterprise)
 the Linux kernel, macOS 10.8+, and Windows Vista and later.
 
 Microsoft ended support for Windows XP on [April 8th, 2014](https://www.microsoft.com/en-us/WindowsForBusiness/end-of-xp-support),
@@ -32,11 +24,7 @@ No attempt is made to prevent installing or running the software on Windows XP, 
 can still do so at your own risk but be aware that there are known instabilities and issues.
 Please do not report issues about Windows XP to the issue tracker.
 
-<<<<<<< HEAD
 traaittXT should also work on most other Unix-like systems but is not
-=======
-Bitcoin Core should also work on most other Unix-like systems but is not
->>>>>>> parent of 9d00be3a85 (traaittXT Enterprise)
 frequently tested on them.
 
 Notable changes
@@ -67,11 +55,7 @@ improved, leading to much shorter sync and initial block download times.
 Manual Pruning
 --------------
 
-<<<<<<< HEAD
 traaittXT has supported automatically pruning the blockchain since 0.11. Pruning
-=======
-Bitcoin Core has supported automatically pruning the blockchain since 0.11. Pruning
->>>>>>> parent of 9d00be3a85 (traaittXT Enterprise)
 the blockchain allows for significant storage space savings as the vast majority of
 the downloaded data can be discarded after processing so very little of it remains
 on the disk.
@@ -145,11 +129,7 @@ the same thing as the GUI icon. The command takes one boolean parameter,
 Out-of-sync Modal Info Layer
 ----------------------------
 
-<<<<<<< HEAD
 When traaittXT is out-of-sync on startup, a semi-transparent information
-=======
-When Bitcoin Core is out-of-sync on startup, a semi-transparent information
->>>>>>> parent of 9d00be3a85 (traaittXT Enterprise)
 layer will be shown over top of the normal display. This layer contains
 details about the current sync progress and estimates the amount of time
 remaining to finish syncing. This layer can also be hidden and subsequently
@@ -209,11 +189,7 @@ commands such as `prioritisetransaction` so that those changes will not be lost.
 Final Alert
 -----------
 
-<<<<<<< HEAD
 The Alert System was [disabled and deprecated](https://bitcoin.org/en/alert/2016-11-01-alert-retirement) in traaittXT 0.12.1 and removed in 0.13.0. 
-=======
-The Alert System was [disabled and deprecated](https://bitcoin.org/en/alert/2016-11-01-alert-retirement) in Bitcoin Core 0.12.1 and removed in 0.13.0. 
->>>>>>> parent of 9d00be3a85 (traaittXT Enterprise)
 The Alert System was retired with a maximum sequence final alert which causes any nodes
 supporting the Alert System to display a static hard-coded "Alert Key Compromised" message which also
 prevents any other alerts from overriding it. This final alert is hard-coded into this release
@@ -265,11 +241,7 @@ Low-level RPC changes
    the mempool or if `txindex` is enabled.
 
  - A new RPC command `getmemoryinfo` has been added which will return information
-<<<<<<< HEAD
    about the memory usage of traaittXT. This was added in conjunction with
-=======
-   about the memory usage of Bitcoin Core. This was added in conjunction with
->>>>>>> parent of 9d00be3a85 (traaittXT Enterprise)
    optimizations to memory management. See [Pull #8753](https://github.com/bitcoin/bitcoin/pull/8753)
    for more information.
 

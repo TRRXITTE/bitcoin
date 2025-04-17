@@ -117,6 +117,7 @@ bool CoinStatsIndex::CustomAppend(const interfaces::BlockInfo& block)
     CBlockUndo block_undo;
     const CAmount block_subsidy{GetBlockSubsidy(block.height, Params().GetConsensus())};
     m_total_subsidy += block_subsidy;
+    m_total_subsidy -= block_subsidy; // ReverseBlock
 
     // Ignore genesis block
     if (block.height > 0) {

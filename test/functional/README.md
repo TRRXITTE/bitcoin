@@ -75,7 +75,7 @@ don't have test cases for.
   load a premined blockchain from cache with the default value of `False`. The
   cached data directories contain a 200-block pre-mined blockchain with the
   spendable mining rewards being split between four nodes. Each node has 25
-  mature block subsidies (25x50=1250 BTC) in its wallet. Using them is much more
+  mature block subsidies (25x50=1250 TRRXITTE) in its wallet. Using them is much more
   efficient than mining blocks in your test.
 - When calling RPCs with lots of arguments, consider using named keyword
   arguments instead of positional arguments to make the intent of the call
@@ -183,7 +183,7 @@ way is the use the `profile_with_perf` context manager, e.g.
 with node.profile_with_perf("send-big-msgs"):
     # Perform activity on the node you're interested in profiling, e.g.:
     for _ in range(10000):
-        node.p2ps[0].send_without_ping(some_large_message)
+        node.p2ps[0].send_message(some_large_message)
 ```
 
 To see useful textual output, run

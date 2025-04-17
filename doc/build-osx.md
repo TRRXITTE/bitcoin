@@ -92,8 +92,10 @@ Bitcoin Core includes a GUI built with the cross-platform Qt Framework. To compi
 Qt, libqrencode and pass `-DBUILD_GUI=ON`. Skip if you don't intend to use the GUI.
 
 ``` bash
-brew install qt@6
+brew install qt@5
 ```
+
+Note: Building may fail if Qt 6 is installed (`qt` or `qt@6`)
 
 Note: Building with Qt binaries downloaded from the Qt website is not officially supported.
 See the notes in [#7714](https://github.com/bitcoin/bitcoin/issues/7714).
@@ -139,7 +141,7 @@ brew install python
 #### Deploy Dependencies
 
 You can [deploy](#3-deploy-optional) a `.zip` containing the Bitcoin Core application.
-It is required that you have `python` and `zip` installed.
+It is required that you have `python` installed.
 
 ## Building Bitcoin Core
 

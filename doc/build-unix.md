@@ -73,13 +73,11 @@ GUI dependencies:
 Bitcoin Core includes a GUI built with the cross-platform Qt Framework. To compile the GUI, we need to install
 the necessary parts of Qt, the libqrencode and pass `-DBUILD_GUI=ON`. Skip if you don't intend to use the GUI.
 
-    sudo apt-get install qt6-base-dev qt6-tools-dev qt6-l10n-tools qt6-tools-dev-tools libgl-dev
-
-For Qt 6.5 and later, the `libxcb-cursor0` package must be installed at runtime.
+    sudo apt-get install qtbase5-dev qttools5-dev qttools5-dev-tools
 
 Additionally, to support Wayland protocol for modern desktop environments:
 
-    sudo apt install qt6-wayland
+    sudo apt install qtwayland5
 
 The GUI will be able to encode addresses in QR codes unless this feature is explicitly disabled. To install libqrencode, run:
 
@@ -123,13 +121,11 @@ GUI dependencies:
 Bitcoin Core includes a GUI built with the cross-platform Qt Framework. To compile the GUI, we need to install
 the necessary parts of Qt, the libqrencode and pass `-DBUILD_GUI=ON`. Skip if you don't intend to use the GUI.
 
-    sudo dnf install qt6-qtbase-devel qt6-qttools-devel
-
-For Qt 6.5 and later, the `xcb-util-cursor` package must be installed at runtime.
+    sudo dnf install qt5-qttools-devel qt5-qtbase-devel
 
 Additionally, to support Wayland protocol for modern desktop environments:
 
-    sudo dnf install qt6-qtwayland
+    sudo dnf install qt5-qtwayland
 
 The GUI will be able to encode addresses in QR codes unless this feature is explicitly disabled. To install libqrencode, run:
 
@@ -149,7 +145,7 @@ The legacy wallet uses Berkeley DB. To ensure backwards compatibility it is
 recommended to use Berkeley DB 4.8. If you have to build it yourself, and don't
 want to use any other libraries built in depends, you can do:
 ```bash
-make -C depends NO_BOOST=1 NO_LIBEVENT=1 NO_QT=1 NO_ZMQ=1 NO_USDT=1
+make -C depends NO_BOOST=1 NO_LIBEVENT=1 NO_QT=1 NO_SQLITE=1 NO_ZMQ=1 NO_USDT=1
 ...
 to: /path/to/bitcoin/depends/x86_64-pc-linux-gnu
 ```

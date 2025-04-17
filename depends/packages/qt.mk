@@ -45,10 +45,12 @@ $(package)_extra_sources += $($(package)_top_cmake_ecmoptionaladdsubdirectory_fi
 $(package)_extra_sources += $($(package)_top_cmake_qttoplevelhelpers_file_name)-$($(package)_version)
 
 define $(package)_set_vars
+$(package)_config_opts += -xcb -xcb-xlib -xkbcommon
 $(package)_config_opts_release := -release
 $(package)_config_opts_debug := -debug
 $(package)_config_opts := -no-egl
-$(package)_config_opts += -no-eglfs
+$(package)_config_opts += -I/home/traaitt/btc-depends/depends/x86_64-pc-linux-gnu/include
+$(package)_config_opts += -L/home/traaitt/btc-depends/depends/x86_64-pc-linux-gnu/lib
 $(package)_config_opts += -no-evdev
 $(package)_config_opts += -no-gif
 $(package)_config_opts += -no-glib

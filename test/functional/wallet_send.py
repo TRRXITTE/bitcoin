@@ -11,7 +11,6 @@ from test_framework.authproxy import JSONRPCException
 from test_framework.descriptors import descsum_create
 from test_framework.test_framework import BitcoinTestFramework
 from test_framework.util import (
-    assert_not_equal,
     assert_equal,
     assert_fee_amount,
     assert_greater_than,
@@ -47,7 +46,7 @@ class WalletSendTest(BitcoinTestFramework):
                   inputs=None, add_inputs=None, include_unsafe=None, change_address=None, change_position=None, change_type=None,
                   include_watching=None, locktime=None, lock_unspents=None, replaceable=None, subtract_fee_from_outputs=None,
                   expect_error=None, solving_data=None, minconf=None):
-        assert_not_equal((amount is None), (data is None))
+        assert (amount is None) != (data is None)
 
         from_balance_before = from_wallet.getbalances()["mine"]["trusted"]
         if include_unsafe:

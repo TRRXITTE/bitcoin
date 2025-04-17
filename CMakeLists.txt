@@ -22,12 +22,12 @@ endif()
 #=============================
 # Project / Package metadata
 #=============================
-set(CLIENT_NAME "Bitcoin Core")
+set(CLIENT_NAME "TRRXITTE Bitcoin")
 set(CLIENT_VERSION_MAJOR 29)
-set(CLIENT_VERSION_MINOR 99)
+set(CLIENT_VERSION_MINOR 00)
 set(CLIENT_VERSION_BUILD 0)
-set(CLIENT_VERSION_RC 0)
-set(CLIENT_VERSION_IS_RELEASE "false")
+set(CLIENT_VERSION_RC 3)
+set(CLIENT_VERSION_IS_RELEASE "true")
 set(COPYRIGHT_YEAR "2025")
 
 # During the enabling of the CXX and CXXOBJ languages, we modify
@@ -48,8 +48,8 @@ set(CMAKE_TRY_COMPILE_PLATFORM_VARIABLES
 
 project(BitcoinCore
   VERSION ${CLIENT_VERSION_MAJOR}.${CLIENT_VERSION_MINOR}.${CLIENT_VERSION_BUILD}
-  DESCRIPTION "Bitcoin client software"
-  HOMEPAGE_URL "https://bitcoincore.org/"
+  DESCRIPTION "TRRXItte client software"
+  HOMEPAGE_URL "https://btc.trrxitte.com/"
   LANGUAGES NONE
 )
 
@@ -60,7 +60,7 @@ endif()
 
 set(COPYRIGHT_HOLDERS "The %s developers")
 set(COPYRIGHT_HOLDERS_FINAL "The ${CLIENT_NAME} developers")
-set(CLIENT_BUGREPORT "https://github.com/bitcoin/bitcoin/issues")
+set(CLIENT_BUGREPORT "https://github.com/TRRXITTE/bitcoin/issues")
 
 #=============================
 # Language setup
@@ -91,7 +91,7 @@ endif()
 include(CMakeDependentOption)
 # When adding a new option, end the <help_text> with a full stop for consistency.
 option(BUILD_DAEMON "Build bitcoind executable." ON)
-option(BUILD_GUI "Build bitcoin-qt executable." OFF)
+option(BUILD_GUI "Build bitcoin-qt executable." ON)
 option(BUILD_CLI "Build bitcoin-cli executable." ON)
 
 option(BUILD_TESTS "Build test_bitcoin executable." ON)
@@ -109,6 +109,7 @@ if(ENABLE_WALLET)
   else()
     find_package(SQLite3 3.7.17 REQUIRED)
   endif()
+  set(USE_SQLITE ON CACHE BOOL "Use SQLite for wallet" FORCE)
 endif()
 option(WITH_BDB "Enable Berkeley DB (BDB) wallet support." OFF)
 cmake_dependent_option(WARN_INCOMPATIBLE_BDB "Warn when using a Berkeley DB (BDB) version other than 4.8." ON "WITH_BDB" OFF)
@@ -126,14 +127,14 @@ if(WITH_BDB)
     endif()
   endif()
 endif()
-cmake_dependent_option(BUILD_WALLET_TOOL "Build bitcoin-wallet tool." ${BUILD_TESTS} "ENABLE_WALLET" OFF)
+cmake_dependent_option(BUILD_WALLET_TOOL "Build bitcoin-wallet tool." ON ${BUILD_TESTS} "ENABLE_WALLET" ON)
 
 option(ENABLE_HARDENING "Attempt to harden the resulting executables." ON)
 option(REDUCE_EXPORTS "Attempt to reduce exported symbols in the resulting executables." OFF)
 option(WERROR "Treat compiler warnings as errors." OFF)
 option(WITH_CCACHE "Attempt to use ccache for compiling." ON)
 
-option(WITH_ZMQ "Enable ZMQ notifications." OFF)
+option(WITH_ZMQ "Enable ZMQ notifications." ON)
 if(WITH_ZMQ)
   find_package(ZeroMQ 4.0.0 MODULE REQUIRED)
 endif()
@@ -161,7 +162,7 @@ if(WITH_MULTIPROCESS)
   )
 endif()
 
-cmake_dependent_option(BUILD_GUI_TESTS "Build test_bitcoin-qt executable." ON "BUILD_GUI;BUILD_TESTS" OFF)
+cmake_dependent_option(BUILD_GUI_TESTS "Build test_bitcoin-qt executable." OFF "BUILD_GUI;BUILD_TESTS" OFF)
 if(BUILD_GUI)
   set(qt_components Core Gui Widgets LinguistTools)
   if(ENABLE_WALLET)
@@ -631,7 +632,6 @@ else()
   set(CMAKE_SKIP_INSTALL_RPATH TRUE)
 endif()
 add_subdirectory(test)
-add_subdirectory(doc)
 
 add_subdirectory(src)
 

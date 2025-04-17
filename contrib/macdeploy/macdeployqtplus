@@ -22,8 +22,6 @@ from pathlib import Path
 from subprocess import PIPE, run
 from typing import Optional
 
-# This is ported from the original macdeployqt with modifications
-
 class FrameworkInfo(object):
     def __init__(self):
         self.frameworkDirectory = ""
@@ -77,13 +75,11 @@ class FrameworkInfo(object):
     bundleBinaryDirectory = "Contents/MacOS"
     
     @classmethod
-    def fromLibraryLine(cls, line: str) -> Optional['FrameworkInfo']:
-        # Note: line must be trimmed
+    def fromLibraryLine(cls, line: str, verbose: int = 0) -> Optional['FrameworkInfo']:
         if line == "":
             return None
         
-        # Don't deploy system libraries
-        if line.startswith("/System/Library/") or line.startswith("@executable_path") or line.startswith("/usr/lib/"):
+        if line.startswith("/System/Library/") or line.startswith("/usr/lib/"):
             return None
         
         m = cls.reOLine.match(line)
@@ -114,7 +110,6 @@ class FrameworkInfo(object):
         else:
             parts = path.split("/")
             i = 0
-            # Search for the .framework directory
             for part in parts:
                 if part.endswith(".framework"):
                     break
@@ -140,12 +135,13 @@ class FrameworkInfo(object):
             info.destinationResourcesDirectory = os.path.join(cls.bundleFrameworkDirectory, info.frameworkName, "Resources")
             info.destinationVersionContentsDirectory = os.path.join(cls.bundleFrameworkDirectory, info.frameworkName, "Versions", info.version, "Contents")
         
+        if verbose >= 2:
+            print(f"Parsed framework info: {info}")
         return info
 
 class ApplicationBundleInfo(object):
     def __init__(self, path: str):
         self.path = path
-        # for backwards compatibility reasons, this must remain as Bitcoin-Qt
         self.binaryPath = os.path.join(path, "Contents", "MacOS", "Bitcoin-Qt")
         if not os.path.exists(self.binaryPath):
             raise RuntimeError(f"Could not find bundle binary for {path}")
@@ -161,7 +157,6 @@ class DeploymentInfo(object):
     def detectQtPath(self, frameworkDirectory: str):
         parentDir = os.path.dirname(frameworkDirectory)
         if os.path.exists(os.path.join(parentDir, "translations")):
-            # Classic layout, e.g. "/usr/local/Trolltech/Qt-4.x.x"
             self.qtPath = parentDir
         else:
             self.qtPath = os.getenv("QTDIR", None)
@@ -183,7 +178,7 @@ class DeploymentInfo(object):
 
 def getFrameworks(binaryPath: str, verbose: int) -> list[FrameworkInfo]:
     objdump = os.getenv("OBJDUMP", "objdump")
-    if verbose:
+    if verbose >= 1:
         print(f"Inspecting with {objdump}: {binaryPath}")
     output = run([objdump, "--macho", "--dylibs-used", binaryPath], stdout=PIPE, stderr=PIPE, text=True)
     if output.returncode != 0:
@@ -192,28 +187,33 @@ def getFrameworks(binaryPath: str, verbose: int) -> list[FrameworkInfo]:
         raise RuntimeError(f"{objdump} failed with return code {output.returncode}")
 
     lines = output.stdout.split("\n")
-    lines.pop(0) # First line is the inspected binary
+    lines.pop(0)
     if ".framework" in binaryPath or binaryPath.endswith(".dylib"):
-        lines.pop(0) # Frameworks and dylibs list themselves as a dependency.
+        lines.pop(0)
     
     libraries = []
     for line in lines:
-        line = line.replace("@loader_path", os.path.dirname(binaryPath))
-        info = FrameworkInfo.fromLibraryLine(line.strip())
-        if info is not None:
-            if verbose:
-                print("Found framework:")
-                print(info)
-            libraries.append(info)
+        line = line.strip()
+        if line:
+            if verbose >= 2:
+                print(f"Detected library line: {line}")
+            if "@loader_path" in line:
+                line = line.replace("@loader_path", os.path.dirname(binaryPath))
+            info = FrameworkInfo.fromLibraryLine(line, verbose)
+            if info is not None:
+                if verbose >= 1:
+                    print("Found framework:")
+                    print(info)
+                libraries.append(info)
     
     return libraries
 
 def runInstallNameTool(action: str, *args):
-    installnametoolbin=os.getenv("INSTALL_NAME_TOOL", "install_name_tool")
+    installnametoolbin = os.getenv("INSTALL_NAME_TOOL", "install_name_tool")
     run([installnametoolbin, "-"+action] + list(args), check=True)
 
 def changeInstallName(oldName: str, newName: str, binaryPath: str, verbose: int):
-    if verbose:
+    if verbose >= 1:
         print("Using install_name_tool:")
         print(" in", binaryPath)
         print(" change reference", oldName)
@@ -221,53 +221,78 @@ def changeInstallName(oldName: str, newName: str, binaryPath: str, verbose: int)
     runInstallNameTool("change", oldName, newName, binaryPath)
 
 def changeIdentification(id: str, binaryPath: str, verbose: int):
-    if verbose:
+    if verbose >= 1:
         print("Using install_name_tool:")
         print(" change identification in", binaryPath)
         print(" to", id)
     runInstallNameTool("id", id, binaryPath)
 
 def runStrip(binaryPath: str, verbose: int):
-    stripbin=os.getenv("STRIP", "strip")
-    if verbose:
+    stripbin = os.getenv("STRIP", "strip")
+    permissions = os.stat(binaryPath).st_mode
+    if not (permissions & stat.S_IWUSR):
+        if verbose >= 2:
+            print(f"File {binaryPath} not writable, forcing permissions")
+        os.chmod(binaryPath, permissions | stat.S_IWUSR)
+    if verbose >= 1:
         print("Using strip:")
         print(" stripped", binaryPath)
     run([stripbin, "-x", binaryPath], check=True)
 
 def copyFramework(framework: FrameworkInfo, path: str, verbose: int) -> Optional[str]:
-    if framework.sourceFilePath.startswith("Qt"):
-        #standard place for Nokia Qt installer's frameworks
-        fromPath = f"/Library/Frameworks/{framework.sourceFilePath}"
-    else:
-        fromPath = framework.sourceFilePath
     toDir = os.path.join(path, framework.destinationDirectory)
     toPath = os.path.join(toDir, framework.binaryName)
+
+    if os.path.exists(toPath):
+        if verbose >= 2:
+            print(f"Skipping copy: {framework.binaryName} already exists at {toPath}")
+        return toPath
+
+    fromPath = framework.sourceFilePath
+    boost_paths = [
+        f"/usr/local/opt/boost/lib/{framework.binaryName}",
+        f"/opt/homebrew/opt/boost/lib/{framework.binaryName}",
+        f"/usr/local/lib/{framework.binaryName}"
+    ]
+
+    if not os.path.exists(fromPath):
+        if "boost" in framework.frameworkName.lower():
+            for boost_path in boost_paths:
+                if os.path.exists(boost_path):
+                    fromPath = boost_path
+                    if verbose >= 2:
+                        print(f"Found Boost library at fallback path: {fromPath}")
+                    break
+            else:
+                raise RuntimeError(f"No file found for {framework.binaryName} at {framework.sourceFilePath} or Boost fallback paths: {boost_paths}")
+
+    if fromPath.startswith("@rpath"):
+        if verbose >= 2:
+            print(f"Skipping copy for {framework.binaryName}: @rpath path assumed pre-copied")
+        return toPath if os.path.exists(toPath) else None
 
     if framework.isDylib():
         if not os.path.exists(fromPath):
             raise RuntimeError(f"No file at {fromPath}")
 
-        if os.path.exists(toPath):
-            return None # Already there
-
         if not os.path.exists(toDir):
             os.makedirs(toDir)
 
         shutil.copy2(fromPath, toPath)
-        if verbose:
+        if verbose >= 1:
             print("Copied:", fromPath)
             print(" to:", toPath)
     else:
         to_dir = os.path.join(path, "Contents", "Frameworks", framework.frameworkName)
         if os.path.exists(to_dir):
-            return None # Already there
+            return None
 
         from_dir = framework.frameworkPath
         if not os.path.exists(from_dir):
             raise RuntimeError(f"No directory at {from_dir}")
 
         shutil.copytree(from_dir, to_dir, symlinks=True)
-        if verbose:
+        if verbose >= 1:
             print("Copied:", from_dir)
             print(" to:", to_dir)
 
@@ -279,9 +304,9 @@ def copyFramework(framework: FrameworkInfo, path: str, verbose: int) -> Optional
         if os.path.exists(headers_dir):
             shutil.rmtree(headers_dir)
 
-    permissions = os.stat(toPath)
-    if not permissions.st_mode & stat.S_IWRITE:
-      os.chmod(toPath, permissions.st_mode | stat.S_IWRITE)
+    os.chmod(toPath, stat.S_IRUSR | stat.S_IWUSR | stat.S_IRGRP | stat.S_IROTH)
+    if verbose >= 2:
+        print(f"Set permissions to writable for {toPath}")
 
     return toPath
 
@@ -289,13 +314,75 @@ def deployFrameworks(frameworks: list[FrameworkInfo], bundlePath: str, binaryPat
     if deploymentInfo is None:
         deploymentInfo = DeploymentInfo()
     
-    while len(frameworks) > 0:
-        framework = frameworks.pop(0)
-        deploymentInfo.deployedFrameworks.append(framework.frameworkName)
+    frameworks_dir = os.path.join(bundlePath, "Contents", "Frameworks")
+    source_frameworks_dir = os.path.join(os.path.dirname(binaryPath), "../Frameworks")
+    
+    if not os.path.exists(frameworks_dir):
+        os.makedirs(frameworks_dir)
+        if verbose >= 2:
+            print(f"Created directory: {frameworks_dir}")
+    
+    critical_libs = []
+    if os.path.exists(source_frameworks_dir):
+        critical_libs = [f for f in os.listdir(source_frameworks_dir) if f.endswith(".dylib")]
+        if verbose >= 2:
+            print(f"Detected critical libraries in source: {critical_libs}")
+    
+    for lib in critical_libs:
+        src_path = os.path.join(source_frameworks_dir, lib)
+        dest_path = os.path.join(frameworks_dir, lib)
+        if os.path.exists(src_path) and not os.path.exists(dest_path):
+            if verbose >= 1:
+                print(f"Pre-copying critical library {lib} to {dest_path}")
+            shutil.copy2(src_path, dest_path)
+            try:
+                subprocess.check_call([
+                    "install_name_tool", "-id",
+                    f"@executable_path/../Frameworks/{lib}",
+                    dest_path
+                ])
+            except subprocess.CalledProcessError as e:
+                sys.stderr.write(f"Error setting install name for {lib}: {str(e)}\n")
+                continue
+            os.chmod(dest_path, stat.S_IRUSR | stat.S_IWUSR | stat.S_IRGRP | stat.S_IROTH)
+            if verbose >= 2:
+                print(f"Set permissions to writable for {dest_path}")
+                print(f"Set install name for {lib} to @executable_path/../Frameworks/{lib}")
+
+    processed_frameworks = set()
+    frameworks_to_process = frameworks.copy()
+
+    # List of critical Qt frameworks to explicitly handle
+    critical_qt_frameworks = ["QtCore", "QtGui", "QtWidgets", "QtDBus"]
+
+    while frameworks_to_process:
+        framework = frameworks_to_process.pop(0)
+        if framework.frameworkName in processed_frameworks:
+            continue
         
+        dest_path = os.path.join(frameworks_dir, framework.binaryName)
+        deployed_path = None
+        
+        if not os.path.exists(dest_path):
+            try:
+                deployed_path = copyFramework(framework, bundlePath, verbose)
+                if deployed_path:
+                    if strip:
+                        runStrip(deployed_path, verbose)
+                    changeIdentification(framework.deployedInstallName, deployed_path, verbose)
+                    changeInstallName(framework.installName, framework.deployedInstallName, binaryPath, verbose)
+            except RuntimeError as e:
+                sys.stderr.write(f"Error processing {framework.frameworkName}: {str(e)}\n")
+                continue
+        else:
+            if verbose >= 2:
+                print(f"Using pre-existing {framework.binaryName} at {dest_path}")
+            changeInstallName(framework.installName, framework.deployedInstallName, binaryPath, verbose)
+
+        deploymentInfo.deployedFrameworks.append(framework.frameworkName)
+        processed_frameworks.add(framework.frameworkName)
         print("Processing", framework.frameworkName, "...")
         
-        # Get the Qt path from one of the Qt frameworks
         if deploymentInfo.qtPath is None and framework.isQtFramework():
             deploymentInfo.detectQtPath(framework.frameworkDirectory)
         
@@ -303,32 +390,192 @@ def deployFrameworks(frameworks: list[FrameworkInfo], bundlePath: str, binaryPat
             print(framework.frameworkName, "already deployed, skipping.")
             continue
         
-        # install_name_tool the new id into the binary
-        changeInstallName(framework.installName, framework.deployedInstallName, binaryPath, verbose)
-        
-        # Copy framework to app bundle.
-        deployedBinaryPath = copyFramework(framework, bundlePath, verbose)
-        # Skip the rest if already was deployed.
-        if deployedBinaryPath is None:
-            continue
-        
-        if strip:
-            runStrip(deployedBinaryPath, verbose)
-        
-        # install_name_tool it a new id.
-        changeIdentification(framework.deployedInstallName, deployedBinaryPath, verbose)
-        # Check for framework dependencies
-        dependencies = getFrameworks(deployedBinaryPath, verbose)
-        
-        for dependency in dependencies:
-            changeInstallName(dependency.installName, dependency.deployedInstallName, deployedBinaryPath, verbose)
-            
-            # Deploy framework if necessary.
-            if dependency.frameworkName not in deploymentInfo.deployedFrameworks and dependency not in frameworks:
-                frameworks.append(dependency)
+        # Explicitly handle critical Qt frameworks
+        if framework.isQtFramework() and deploymentInfo.qtPath:
+            for qt_framework in critical_qt_frameworks:
+                if qt_framework == framework.frameworkName:
+                    continue  # Skip the framework being processed
+                if qt_framework in processed_frameworks:
+                    continue  # Skip if already processed
+                
+                # Construct source and destination paths for the critical framework
+                src_framework_path = os.path.join(deploymentInfo.qtPath, "lib", f"{qt_framework}.framework")
+                dest_framework_path = os.path.join(frameworks_dir, f"{qt_framework}.framework")
+                binary_name = qt_framework
+                dest_binary_path = os.path.join(dest_framework_path, "Versions", "A", binary_name)
+                
+                if not os.path.exists(dest_framework_path) and os.path.exists(src_framework_path):
+                    if verbose >= 1:
+                        print(f"Explicitly copying critical Qt framework {qt_framework} from {src_framework_path} to {dest_framework_path}")
+                    shutil.copytree(src_framework_path, dest_framework_path, symlinks=True)
+                    os.chmod(dest_binary_path, stat.S_IRUSR | stat.S_IWUSR | stat.S_IRGRP | stat.S_IROTH)
+                    
+                    # Update the framework's identification
+                    deployed_install_name = f"@executable_path/../Frameworks/{qt_framework}.framework/Versions/A/{qt_framework}"
+                    try:
+                        changeIdentification(deployed_install_name, dest_binary_path, verbose)
+                    except subprocess.CalledProcessError as e:
+                        sys.stderr.write(f"Error setting identification for {qt_framework}: {str(e)}\n")
+                        continue
+                    
+                    # Link it to the current binary if it's a dependency
+                    deployedBinaryPath = dest_path if os.path.exists(dest_path) else deployed_path
+                    if deployedBinaryPath:
+                        dependencies = getFrameworks(deployedBinaryPath, verbose)
+                        for dep in dependencies:
+                            if dep.frameworkName == qt_framework:
+                                changeInstallName(dep.installName, deployed_install_name, deployedBinaryPath, verbose)
+                    
+                    deploymentInfo.deployedFrameworks.append(qt_framework)
+                    processed_frameworks.add(qt_framework)
+                    if verbose >= 2:
+                        print(f"Explicitly deployed and linked {qt_framework}")
+
+        deployedBinaryPath = dest_path if os.path.exists(dest_path) else deployed_path
+        if deployedBinaryPath:
+            dependencies = getFrameworks(deployedBinaryPath, verbose)
+            for dependency in dependencies:
+                dep_path = os.path.join(frameworks_dir, dependency.binaryName)
+                if os.path.exists(dep_path):
+                    if verbose >= 2:
+                        print(f"Using pre-existing {dependency.binaryName} at {dep_path}")
+                    changeInstallName(dependency.installName, dependency.deployedInstallName, deployedBinaryPath, verbose)
+                else:
+                    if dependency.frameworkName not in processed_frameworks and dependency.frameworkName not in [f.frameworkName for f in frameworks_to_process]:
+                        if verbose >= 1:
+                            print(f"Detected missing dependency {dependency.frameworkName}, adding to deployment queue")
+                        frameworks_to_process.append(dependency)
+                    changeInstallName(dependency.installName, dependency.deployedInstallName, deployedBinaryPath, verbose)
+    
+    # Final validation for missing dependencies
+    missing_deps = []
+    for framework in deploymentInfo.deployedFrameworks:
+        deployed_path = os.path.join(frameworks_dir, f"{framework}.framework/Versions/A/{framework}" if not framework.endswith(".dylib") else framework)
+        if os.path.exists(deployed_path):
+            dependencies = getFrameworks(deployed_path, verbose)
+            for dep in dependencies:
+                if dep.frameworkName not in deploymentInfo.deployedFrameworks:
+                    missing_deps.append((framework, dep.frameworkName))
+                    sys.stderr.write(f"Warning: {dep.frameworkName} is a dependency of {framework} but was not deployed.\n")
+    
+    if missing_deps:
+        sys.stderr.write("Potential missing dependencies detected:\n")
+        for parent, dep in missing_deps:
+            sys.stderr.write(f" - {dep} required by {parent}\n")
+        sys.stderr.write("This may cause runtime errors like 'Library not loaded' (e.g., QtDBus missing for QtGui).\n")
     
     return deploymentInfo
+    if deploymentInfo is None:
+        deploymentInfo = DeploymentInfo()
+    
+    frameworks_dir = os.path.join(bundlePath, "Contents", "Frameworks")
+    source_frameworks_dir = os.path.join(os.path.dirname(binaryPath), "../Frameworks")
+    
+    if not os.path.exists(frameworks_dir):
+        os.makedirs(frameworks_dir)
+        if verbose >= 2:
+            print(f"Created directory: {frameworks_dir}")
+    
+    critical_libs = []
+    if os.path.exists(source_frameworks_dir):
+        critical_libs = [f for f in os.listdir(source_frameworks_dir) if f.endswith(".dylib")]
+        if verbose >= 2:
+            print(f"Detected critical libraries in source: {critical_libs}")
+    
+    for lib in critical_libs:
+        src_path = os.path.join(source_frameworks_dir, lib)
+        dest_path = os.path.join(frameworks_dir, lib)
+        if os.path.exists(src_path) and not os.path.exists(dest_path):
+            if verbose >= 1:
+                print(f"Pre-copying critical library {lib} to {dest_path}")
+            shutil.copy2(src_path, dest_path)
+            try:
+                subprocess.check_call([
+                    "install_name_tool", "-id",
+                    f"@executable_path/../Frameworks/{lib}",
+                    dest_path
+                ])
+            except subprocess.CalledProcessError as e:
+                sys.stderr.write(f"Error setting install name for {lib}: {str(e)}\n")
+                continue
+            os.chmod(dest_path, stat.S_IRUSR | stat.S_IWUSR | stat.S_IRGRP | stat.S_IROTH)
+            if verbose >= 2:
+                print(f"Set permissions to writable for {dest_path}")
+                print(f"Set install name for {lib} to @executable_path/../Frameworks/{lib}")
 
+    processed_frameworks = set()  # Track processed frameworks to avoid duplicates
+    frameworks_to_process = frameworks.copy()  # Queue for frameworks to process
+
+    while frameworks_to_process:
+        framework = frameworks_to_process.pop(0)  # Process frameworks one by one
+        if framework.frameworkName in processed_frameworks:
+            continue
+        
+        dest_path = os.path.join(frameworks_dir, framework.binaryName)
+        deployed_path = None
+        
+        if not os.path.exists(dest_path):
+            try:
+                deployed_path = copyFramework(framework, bundlePath, verbose)
+                if deployed_path:
+                    if strip:
+                        runStrip(deployed_path, verbose)
+                    changeIdentification(framework.deployedInstallName, deployed_path, verbose)
+                    changeInstallName(framework.installName, framework.deployedInstallName, binaryPath, verbose)
+            except RuntimeError as e:
+                sys.stderr.write(f"Error processing {framework.frameworkName}: {str(e)}\n")
+                continue
+        else:
+            if verbose >= 2:
+                print(f"Using pre-existing {framework.binaryName} at {dest_path}")
+            changeInstallName(framework.installName, framework.deployedInstallName, binaryPath, verbose)
+
+        deploymentInfo.deployedFrameworks.append(framework.frameworkName)
+        processed_frameworks.add(framework.frameworkName)
+        print("Processing", framework.frameworkName, "...")
+        
+        if deploymentInfo.qtPath is None and framework.isQtFramework():
+            deploymentInfo.detectQtPath(framework.frameworkDirectory)
+        
+        if framework.installName.startswith("@executable_path") or framework.installName.startswith(bundlePath):
+            print(framework.frameworkName, "already deployed, skipping.")
+            continue
+        
+        deployedBinaryPath = dest_path if os.path.exists(dest_path) else deployed_path
+        if deployedBinaryPath:
+            dependencies = getFrameworks(deployedBinaryPath, verbose)
+            for dependency in dependencies:
+                dep_path = os.path.join(frameworks_dir, dependency.binaryName)
+                if os.path.exists(dep_path):
+                    if verbose >= 2:
+                        print(f"Using pre-existing {dependency.binaryName} at {dep_path}")
+                    changeInstallName(dependency.installName, dependency.deployedInstallName, deployedBinaryPath, verbose)
+                else:
+                    # If dependency is missing (e.g., QtDBus), add it to the processing queue
+                    if dependency.frameworkName not in processed_frameworks and dependency.frameworkName not in [f.frameworkName for f in frameworks_to_process]:
+                        if verbose >= 1:
+                            print(f"Detected missing dependency {dependency.frameworkName}, adding to deployment queue")
+                        frameworks_to_process.append(dependency)
+                    changeInstallName(dependency.installName, dependency.deployedInstallName, deployedBinaryPath, verbose)
+    
+    # Final validation for missing dependencies
+    missing_deps = []
+    for framework in deploymentInfo.deployedFrameworks:
+        deployed_path = os.path.join(frameworks_dir, f"{framework}.framework/Versions/A/{framework}" if not framework.endswith(".dylib") else framework)
+        if os.path.exists(deployed_path):
+            dependencies = getFrameworks(deployed_path, verbose)
+            for dep in dependencies:
+                if dep.frameworkName not in deploymentInfo.deployedFrameworks:
+                    missing_deps.append((framework, dep.frameworkName))
+                    sys.stderr.write(f"Warning: {dep.frameworkName} is a dependency of {framework} but was not deployed.\n")
+    
+    if missing_deps:
+        sys.stderr.write("Potential missing dependencies detected:\n")
+        for parent, dep in missing_deps:
+            sys.stderr.write(f" - {dep} required by {parent}\n")
+        sys.stderr.write("This may cause runtime errors like 'Library not loaded' (e.g., QtDBus missing for QtGui).\n")
+    
+    return deploymentInfo
 def deployFrameworksForAppBundle(applicationBundle: ApplicationBundleInfo, strip: bool, verbose: int) -> DeploymentInfo:
     frameworks = getFrameworks(applicationBundle.binaryPath, verbose)
     if len(frameworks) == 0:
@@ -365,7 +612,7 @@ def deployPlugins(appBundleInfo: ApplicationBundleInfo, deploymentInfo: Deployme
         
         destinationPath = os.path.join(destinationDirectory, pluginName)
         shutil.copy2(sourcePath, destinationPath)
-        if verbose:
+        if verbose >= 1:
             print("Copied:", sourcePath)
             print(" to:", destinationPath)
         
@@ -377,7 +624,6 @@ def deployPlugins(appBundleInfo: ApplicationBundleInfo, deploymentInfo: Deployme
         for dependency in dependencies:
             changeInstallName(dependency.installName, dependency.deployedInstallName, destinationPath, verbose)
             
-            # Deploy framework if necessary.
             if dependency.frameworkName not in deploymentInfo.deployedFrameworks:
                 deployFrameworks([dependency], appBundleInfo.path, destinationPath, strip, verbose, deploymentInfo)
 
@@ -386,11 +632,10 @@ ap = ArgumentParser(description="""Improved version of macdeployqt.
 Outputs a ready-to-deploy app in a folder "dist" and optionally wraps it in a .zip file.
 Note, that the "dist" folder will be deleted before deploying on each run.
 
-Optionally, Qt translation files (.qm) can be added to the bundle.""")
-
+Optionally, Qt translation files (.qm) can be added to the bundle's resources.""")
 ap.add_argument("app_bundle", nargs=1, metavar="app-bundle", help="application bundle to be deployed")
 ap.add_argument("appname", nargs=1, metavar="appname", help="name of the app being deployed")
-ap.add_argument("-verbose", nargs="?", const=True, help="Output additional debugging information")
+ap.add_argument("-verbose", nargs="?", type=int, const=1, default=0, help="Output additional debugging information (0-2)")
 ap.add_argument("-no-plugins", dest="plugins", action="store_false", default=True, help="skip plugin deployment")
 ap.add_argument("-no-strip", dest="strip", action="store_false", default=True, help="don't run 'strip' on the binaries")
 ap.add_argument("-translations-dir", nargs=1, metavar="path", default=None, help="Path to Qt's translations. Base translations will automatically be added to the bundle's resources.")
@@ -400,16 +645,12 @@ config = ap.parse_args()
 
 verbose = config.verbose
 
-# ------------------------------------------------
-
 app_bundle = config.app_bundle[0]
 appname = config.appname[0]
 
 if not os.path.exists(app_bundle):
     sys.stderr.write(f"Error: Could not find app bundle \"{app_bundle}\"\n")
     sys.exit(1)
-
-# ------------------------------------------------
 
 if os.path.exists("dist"):
     print("+ Removing existing dist folder +")
@@ -419,20 +660,16 @@ if os.path.exists(appname + ".zip"):
     print("+ Removing existing .zip +")
     os.unlink(appname + ".zip")
 
-# ------------------------------------------------
-
 target = os.path.join("dist", "Bitcoin-Qt.app")
 
 print("+ Copying source bundle +")
-if verbose:
+if verbose >= 1:
     print(app_bundle, "->", target)
 
 os.mkdir("dist")
 shutil.copytree(app_bundle, target, symlinks=True)
 
 applicationBundle = ApplicationBundleInfo(target)
-
-# ------------------------------------------------
 
 print("+ Deploying frameworks +")
 
@@ -447,8 +684,6 @@ except RuntimeError as e:
     sys.stderr.write(f"Error: {str(e)}\n")
     sys.exit(1)
 
-# ------------------------------------------------
-
 if config.plugins:
     print("+ Deploying plugins +")
     
@@ -458,27 +693,21 @@ if config.plugins:
         sys.stderr.write(f"Error: {str(e)}\n")
         sys.exit(1)
 
-# ------------------------------------------------
-
 if config.translations_dir:
     if not Path(config.translations_dir[0]).exists():
         sys.stderr.write(f"Error: Could not find translation dir \"{config.translations_dir[0]}\"\n")
         sys.exit(1)
 
-print("+ Adding Qt translations +")
+    print("+ Adding Qt translations +")
 
-translations = Path(config.translations_dir[0])
+    translations = Path(config.translations_dir[0])
+    regex = re.compile('qt_[a-z]*(.qm|_[A-Z]*.qm)')
+    lang_files = [x for x in translations.iterdir() if regex.match(x.name)]
 
-regex = re.compile('qt_[a-z]*(.qm|_[A-Z]*.qm)')
-
-lang_files = [x for x in translations.iterdir() if regex.match(x.name)]
-
-for file in lang_files:
-    if verbose:
-        print(file.as_posix(), "->", os.path.join(applicationBundle.resourcesPath, file.name))
-    shutil.copy2(file.as_posix(), os.path.join(applicationBundle.resourcesPath, file.name))
-
-# ------------------------------------------------
+    for file in lang_files:
+        if verbose >= 1:
+            print(file.as_posix(), "->", os.path.join(applicationBundle.resourcesPath, file.name))
+        shutil.copy2(file.as_posix(), os.path.join(applicationBundle.resourcesPath, file.name))
 
 print("+ Installing qt.conf +")
 
@@ -490,17 +719,11 @@ Plugins=PlugIns
 with open(os.path.join(applicationBundle.resourcesPath, "qt.conf"), "wb") as f:
     f.write(qt_conf.encode())
 
-# ------------------------------------------------
-
 if platform.system() == "Darwin":
     subprocess.check_call(f"codesign --deep --force --sign - {target}", shell=True)
 
-# ------------------------------------------------
-
 if config.zip is not None:
     shutil.make_archive('{}'.format(appname), format='zip', root_dir='dist', base_dir='Bitcoin-Qt.app')
-
-# ------------------------------------------------
 
 print("+ Done +")
 

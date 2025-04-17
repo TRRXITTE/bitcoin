@@ -34,7 +34,6 @@ from test_framework.util import (
     assert_equal,
     assert_greater_than,
     assert_raises_rpc_error,
-    sync_txindex,
 )
 from test_framework.wallet import (
     getnewdestination,
@@ -71,7 +70,7 @@ class RawTransactionsTest(BitcoinTestFramework):
         self.num_nodes = 3
         self.extra_args = [
             ["-txindex"],
-            [],
+            ["-txindex"],
             ["-fastprune", "-prune=1"],
         ]
         # whitelist peers to speed up tx relay / mempool sync
@@ -110,7 +109,6 @@ class RawTransactionsTest(BitcoinTestFramework):
             self.log.info(f"Test getrawtransaction {'with' if n == 0 else 'without'} -txindex")
 
             if n == 0:
-                sync_txindex(self, self.nodes[n])
                 # With -txindex.
                 # 1. valid parameters - only supply txid
                 assert_equal(self.nodes[n].getrawtransaction(txId), tx['hex'])
@@ -405,7 +403,7 @@ class RawTransactionsTest(BitcoinTestFramework):
         fee_exceeds_max = "Fee exceeds maximum configured by user (e.g. -maxtxfee, maxfeerate)"
 
         # Test a transaction with a small fee.
-        # Fee rate is 0.00100000 BTC/kvB
+        # Fee rate is 0.00100000 TRRXITTE/kvB
         tx = self.wallet.create_self_transfer(fee_rate=Decimal('0.00100000'))
         # Thus, testmempoolaccept should reject
         testres = self.nodes[2].testmempoolaccept([tx['hex']], 0.00001000)[0]
@@ -419,7 +417,7 @@ class RawTransactionsTest(BitcoinTestFramework):
         self.nodes[2].sendrawtransaction(hexstring=tx['hex'])
 
         # Test a transaction with a large fee.
-        # Fee rate is 0.20000000 BTC/kvB
+        # Fee rate is 0.20000000 TRRXITTE/kvB
         tx = self.wallet.create_self_transfer(fee_rate=Decimal("0.20000000"))
         # Thus, testmempoolaccept should reject
         testres = self.nodes[2].testmempoolaccept([tx['hex']])[0]
@@ -517,7 +515,7 @@ class RawTransactionsTest(BitcoinTestFramework):
         # use balance deltas instead of absolute values
         bal = self.nodes[2].getbalance()
 
-        # send 1.2 BTC to msig adr
+        # send 1.2 TRRXITTE to msig adr
         txId = self.nodes[0].sendtoaddress(mSigObj, 1.2)
         self.sync_all()
         self.generate(self.nodes[0], 1)

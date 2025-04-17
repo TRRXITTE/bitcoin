@@ -78,10 +78,10 @@ MAX_OP_RETURN_RELAY = 83
 DEFAULT_MEMPOOL_EXPIRY_HOURS = 336  # hours
 
 MAGIC_BYTES = {
-    "mainnet": b"\xf9\xbe\xb4\xd9",
-    "testnet4": b"\x1c\x16\x3f\x28",
-    "regtest": b"\xfa\xbf\xb5\xda",
-    "signet": b"\x0a\x03\xcf\x40",
+    "mainnet": b"\xf9\xbe\xb4\xd9",   # mainnet
+    "testnet3": b"\x0b\x11\x09\x07",  # testnet3
+    "regtest": b"\xfa\xbf\xb5\xda",   # regtest
+    "signet": b"\x0a\x03\xcf\x40",    # signet
 }
 
 def sha256(s):
@@ -118,26 +118,6 @@ def deser_compact_size(f):
     elif nit == 255:
         nit = int.from_bytes(f.read(8), "little")
     return nit
-
-
-def ser_varint(l):
-    r = b""
-    while True:
-        r = bytes([(l & 0x7f) | (0x80 if len(r) > 0 else 0x00)]) + r
-        if l <= 0x7f:
-            return r
-        l = (l >> 7) - 1
-
-
-def deser_varint(f):
-    n = 0
-    while True:
-        dat = f.read(1)[0]
-        n = (n << 7) | (dat & 0x7f)
-        if (dat & 0x80) > 0:
-            n += 1
-        else:
-            return n
 
 
 def deser_string(f):
@@ -1933,20 +1913,3 @@ class TestFrameworkScript(unittest.TestCase):
         check_addrv2("2bqghnldu6mcug4pikzprwhtjjnsyederctvci6klcwzepnjd46ikjyd.onion", CAddress.NET_TORV3)
         check_addrv2("255fhcp6ajvftnyo7bwz3an3t4a4brhopm3bamyh2iu5r3gnr2rq.b32.i2p", CAddress.NET_I2P)
         check_addrv2("fc32:17ea:e415:c3bf:9808:149d:b5a2:c9aa", CAddress.NET_CJDNS)
-
-    def test_varint_encode_decode(self):
-        def check_varint(num, expected_encoding_hex):
-            expected_encoding = bytes.fromhex(expected_encoding_hex)
-            self.assertEqual(ser_varint(num), expected_encoding)
-            self.assertEqual(deser_varint(BytesIO(expected_encoding)), num)
-
-        # test cases from serialize_tests.cpp:varint_bitpatterns
-        check_varint(0, "00")
-        check_varint(0x7f, "7f")
-        check_varint(0x80, "8000")
-        check_varint(0x1234, "a334")
-        check_varint(0xffff, "82fe7f")
-        check_varint(0x123456, "c7e756")
-        check_varint(0x80123456, "86ffc7e756")
-        check_varint(0xffffffff, "8efefefe7f")
-        check_varint(0xffffffffffffffff, "80fefefefefefefefe7f")

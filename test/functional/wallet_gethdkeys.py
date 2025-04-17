@@ -9,7 +9,6 @@ from test_framework.test_framework import BitcoinTestFramework
 from test_framework.util import (
     assert_equal,
     assert_raises_rpc_error,
-    assert_not_equal,
 )
 from test_framework.wallet_util import WalletUnlock
 
@@ -60,7 +59,7 @@ class WalletGetHDKeyTest(BitcoinTestFramework):
         # New key is active, should be able to get only that one and its descriptors
         xpub_info = wallet.gethdkeys(active_only=True)
         assert_equal(len(xpub_info), 1)
-        assert_not_equal(xpub_info[0]["xpub"], xpub)
+        assert xpub_info[0]["xpub"] != xpub
         assert "xprv" not in xpub_info[0]
         assert_equal(xpub_info[0]["has_private"], True)
 
@@ -68,7 +67,7 @@ class WalletGetHDKeyTest(BitcoinTestFramework):
         assert_raises_rpc_error(-13, "Error: Please enter the wallet passphrase with walletpassphrase first", wallet.gethdkeys, private=True)
         with WalletUnlock(wallet, "pass"):
             xpub_info = wallet.gethdkeys(active_only=True, private=True)[0]
-            assert_not_equal(xpub_info["xprv"], xprv)
+            assert xpub_info["xprv"] != xprv
             for desc in wallet.listdescriptors(True)["descriptors"]:
                 if desc["active"]:
                     # After encrypting, HD key was rotated and should appear in all active descriptors

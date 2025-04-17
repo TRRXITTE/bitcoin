@@ -1957,26 +1957,12 @@ CAmount GetBlockSubsidy(int nHeight, const Consensus::Params& consensusParams)
     };
 
     static const SubsidyPhase phases[] = {
-        {10000,    1000 * COIN, 0.0190}, // Phase 1: Blocks 1–10,000 (~0.019 years), 1,000 coins
-        {179500,   100 * COIN,  0.322},  // Phase 2: Blocks 10,001–179,500 (~0.322 years), 100 coins
-        {349000,   50 * COIN,   0.322},  // Phase 3: Blocks 179,501–349,000 (~0.322 years), 50 coins
-        {518500,   25 * COIN,   0.322},  // Phase 4: Blocks 349,001–518,500 (~0.322 years), 25 coins
-        {688000,   15 * COIN,   0.322},  // Phase 5: Blocks 518,501–688,000 (~0.322 years), 15 coins
-        {857500,   14 * COIN,   0.322},  // Phase 6: Blocks 688,001–857,500 (~0.322 years), 14 coins
-        {1027000,  13 * COIN,   0.322},  // Phase 7: Blocks 857,501–1,027,000 (~0.322 years), 13 coins
-        {1196500,  12 * COIN,   0.322},  // Phase 8: Blocks 1,027,001–1,196,500 (~0.322 years), 12 coins
-        {1366000,  11 * COIN,   0.322},  // Phase 9: Blocks 1,196,501–1,366,000 (~0.322 years), 11 coins
-        {1535500,  10 * COIN,   0.322},  // Phase 10: Blocks 1,366,001–1,535,500 (~0.322 years), 10 coins
-        {1705000,  9 * COIN,    0.322},  // Phase 11: Blocks 1,535,501–1,705,000 (~0.322 years), 9 coins
-        {1874500,  8 * COIN,    0.322},  // Phase 12: Blocks 1,705,001–1,874,500 (~0.322 years), 8 coins
-        {2044000,  7 * COIN,    0.322},  // Phase 13: Blocks 1,874,501–2,044,000 (~0.322 years), 7 coins
-        {2213500,  6 * COIN,    0.322},  // Phase 14: Blocks 2,044,001–2,213,500 (~0.322 years), 6 coins
-        {2383000,  5 * COIN,    0.322},  // Phase 15: Blocks 2,213,501–2,383,000 (~0.322 years), 5 coins
-        {2552500,  4 * COIN,    0.322},  // Phase 16: Blocks 2,383,001–2,552,500 (~0.322 years), 4 coins
-        {2722000,  3 * COIN,    0.322},  // Phase 17: Blocks 2,552,501–2,722,000 (~0.322 years), 3 coins
-        {2891500,  2 * COIN,    0.322},  // Phase 18: Blocks 2,722,001–2,891,500 (~0.322 years), 2 coins
-        {3061000,  1 * COIN,    0.322},  // Phase 19: Blocks 2,891,501–3,061,000 (~0.322 years), 1 coin
-        {19060400, 25 * COIN / 10, 30.44} // Phase 20: Blocks 3,061,001–19,060,400 (~30.44 years), 2.5 coins
+        {1000,    1000 * COIN, 0.0190}, // Phase 1: Blocks 1–10,000 (~0.019 years), 1,000 coins
+        {2500,   100 * COIN,  0.322},  // Phase 2: Blocks 10,001–179,500 (~0.322 years), 100 coins
+        {4000,   25 * COIN,   0.322},  // Phase 4: Blocks 349,001–518,500 (~0.322 years), 25 coins
+        {4100,   15 * COIN,   0.322},  // Phase 5: Blocks 518,501–688,000 (~0.322 years), 15 coins
+        {4200,   14 * COIN,   0.322},  // Phase 6: Blocks 688,001–857,500 (~0.322 years), 14 coins
+        {4400, 25 * COIN / 10, 30.44} // Phase 20: Blocks 3,061,001–19,060,400 (~30.44 years), 2.5 coins
     };
  
     for (const SubsidyPhase& phase : phases) {

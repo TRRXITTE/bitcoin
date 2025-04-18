@@ -21,49 +21,94 @@
 
 BOOST_FIXTURE_TEST_SUITE(validation_tests, TestingSetup)
 
-static void TestBlockSubsidyHalvings(const Consensus::Params& consensusParams)
+static void TestBlockSubsidyPhases(const Consensus::Params& consensusParams)
 {
-    int maxHalvings = 64;
-    CAmount nInitialSubsidy = 50 * COIN;
+    // Test genesis block
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(0, consensusParams), 0);
 
-    CAmount nPreviousSubsidy = nInitialSubsidy * 2; // for height == 0
-    BOOST_CHECK_EQUAL(nPreviousSubsidy, nInitialSubsidy * 2);
-    for (int nHalvings = 0; nHalvings < maxHalvings; nHalvings++) {
-        int nHeight = nHalvings * consensusParams.nSubsidyHalvingInterval;
-        CAmount nSubsidy = GetBlockSubsidy(nHeight, consensusParams);
-        BOOST_CHECK(nSubsidy <= nInitialSubsidy);
-        BOOST_CHECK_EQUAL(nSubsidy, nPreviousSubsidy / 2);
-        nPreviousSubsidy = nSubsidy;
-    }
-    BOOST_CHECK_EQUAL(GetBlockSubsidy(maxHalvings * consensusParams.nSubsidyHalvingInterval, consensusParams), 0);
+    // Test phase boundaries
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(1, consensusParams), 1000 * COIN);       // Phase 1 start
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(10000, consensusParams), 1000 * COIN);     // Phase 1 end
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(10001, consensusParams), 100 * COIN);      // Phase 2 start
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(179500, consensusParams), 100 * COIN);   // Phase 2 end
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(179501, consensusParams), 50 * COIN);    // Phase 3 start
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(349000, consensusParams), 50 * COIN);    // Phase 3 end
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(349001, consensusParams), 25 * COIN);    // Phase 4 start
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(518500, consensusParams), 25 * COIN);    // Phase 4 end
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(518501, consensusParams), 15 * COIN);    // Phase 5 start
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(688000, consensusParams), 15 * COIN);    // Phase 5 end
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(688001, consensusParams), 14 * COIN);    // Phase 6 start
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(857500, consensusParams), 14 * COIN);    // Phase 6 end
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(857501, consensusParams), 13 * COIN);    // Phase 7 start
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(1027000, consensusParams), 13 * COIN);   // Phase 7 end
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(1027001, consensusParams), 12 * COIN);   // Phase 8 start
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(1196500, consensusParams), 12 * COIN);   // Phase 8 end
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(1196501, consensusParams), 11 * COIN);   // Phase 9 start
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(1366000, consensusParams), 11 * COIN);   // Phase 9 end
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(1366001, consensusParams), 10 * COIN);   // Phase 10 start
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(1535500, consensusParams), 10 * COIN);   // Phase 10 end
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(1535501, consensusParams), 9 * COIN);    // Phase 11 start
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(1705000, consensusParams), 9 * COIN);    // Phase 11 end
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(1705001, consensusParams), 8 * COIN);    // Phase 12 start
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(1874500, consensusParams), 8 * COIN);    // Phase 12 end
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(1874501, consensusParams), 7 * COIN);    // Phase 13 start
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(2044000, consensusParams), 7 * COIN);    // Phase 13 end
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(2044001, consensusParams), 6 * COIN);    // Phase 14 start
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(2213500, consensusParams), 6 * COIN);    // Phase 14 end
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(2213501, consensusParams), 5 * COIN);    // Phase 15 start
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(2383000, consensusParams), 5 * COIN);    // Phase 15 end
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(2383001, consensusParams), 4 * COIN);    // Phase 16 start
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(2552500, consensusParams), 4 * COIN);    // Phase 16 end
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(2552501, consensusParams), 3 * COIN);    // Phase 17 start
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(2722000, consensusParams), 3 * COIN);    // Phase 17 end
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(2722001, consensusParams), 2 * COIN);    // Phase 18 start
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(2891500, consensusParams), 2 * COIN);    // Phase 18 end
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(2891501, consensusParams), 1 * COIN);    // Phase 19 start
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(3061000, consensusParams), 1 * COIN);    // Phase 19 end
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(3061001, consensusParams), 25 * COIN / 10); // Phase 20 start
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(19060400, consensusParams), 25 * COIN / 10); // Phase 20 end
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(19060401, consensusParams), 0);          // Post-phases
+
+    // Test mid-phase values
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(50, consensusParams), 1000 * COIN);      // Mid-phase 1
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(94750, consensusParams), 100 * COIN);    // Mid-phase 2
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(264250, consensusParams), 50 * COIN);    // Mid-phase 3
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(433750, consensusParams), 25 * COIN);    // Mid-phase 4
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(603250, consensusParams), 15 * COIN);    // Mid-phase 5
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(772750, consensusParams), 14 * COIN);    // Mid-phase 6
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(942250, consensusParams), 13 * COIN);    // Mid-phase 7
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(1111750, consensusParams), 12 * COIN);   // Mid-phase 8
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(1281250, consensusParams), 11 * COIN);   // Mid-phase 9
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(1450750, consensusParams), 10 * COIN);   // Mid-phase 10
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(1620250, consensusParams), 9 * COIN);    // Mid-phase 11
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(1789750, consensusParams), 8 * COIN);    // Mid-phase 12
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(1959250, consensusParams), 7 * COIN);    // Mid-phase 13
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(2128750, consensusParams), 6 * COIN);    // Mid-phase 14
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(2298250, consensusParams), 5 * COIN);    // Mid-phase 15
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(2467750, consensusParams), 4 * COIN);    // Mid-phase 16
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(2637250, consensusParams), 3 * COIN);    // Mid-phase 17
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(2806750, consensusParams), 2 * COIN);    // Mid-phase 18
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(2976250, consensusParams), 1 * COIN);    // Mid-phase 19
+    BOOST_CHECK_EQUAL(GetBlockSubsidy(10810700, consensusParams), 25 * COIN / 10); // Mid-phase 20
 }
 
-static void TestBlockSubsidyHalvings(int nSubsidyHalvingInterval)
+BOOST_AUTO_TEST_CASE(block_subsidy_phases)
 {
-    Consensus::Params consensusParams;
-    consensusParams.nSubsidyHalvingInterval = nSubsidyHalvingInterval;
-    TestBlockSubsidyHalvings(consensusParams);
-}
-
-BOOST_AUTO_TEST_CASE(block_subsidy_test)
-{
-    const auto chainParams = CreateChainParams(*m_node.args, ChainType::MAIN);
-    TestBlockSubsidyHalvings(chainParams->GetConsensus()); // As in main
-    TestBlockSubsidyHalvings(150); // As in regtest
-    TestBlockSubsidyHalvings(1000); // Just another interval
+    const CChainParams& chainparams = Params();
+    TestBlockSubsidyPhases(chainparams.GetConsensus());
 }
 
 BOOST_AUTO_TEST_CASE(subsidy_limit_test)
 {
     const auto chainParams = CreateChainParams(*m_node.args, ChainType::MAIN);
     CAmount nSum = 0;
-    for (int nHeight = 0; nHeight < 14000000; nHeight += 1000) {
+    for (int nHeight = 0; nHeight <= 19060400; nHeight += 1000) {
         CAmount nSubsidy = GetBlockSubsidy(nHeight, chainParams->GetConsensus());
-        BOOST_CHECK(nSubsidy <= 50 * COIN);
+        BOOST_CHECK(nSubsidy <= 1000 * COIN);
         nSum += nSubsidy * 1000;
         BOOST_CHECK(MoneyRange(nSum));
     }
-    BOOST_CHECK_EQUAL(nSum, CAmount{2099999997690000});
+    BOOST_CHECK_EQUAL(nSum, CAmount{6723860000000000}); // ~67,238,600 coins
 }
 
 BOOST_AUTO_TEST_CASE(signet_parse_tests)

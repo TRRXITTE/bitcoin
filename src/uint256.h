@@ -20,6 +20,10 @@
 #include <string>
 #include <string_view>
 
+
+
+
+
 /** Template base class for fixed-sized opaque blobs. */
 template<unsigned int BITS>
 class base_blob

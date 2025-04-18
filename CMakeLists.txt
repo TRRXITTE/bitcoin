@@ -22,9 +22,9 @@ endif()
 #=============================
 # Project / Package metadata
 #=============================
-set(CLIENT_NAME "Bitcoin Core")
+set(CLIENT_NAME "TRRXITTE Bitcoin")
 set(CLIENT_VERSION_MAJOR 29)
-set(CLIENT_VERSION_MINOR 0)
+set(CLIENT_VERSION_MINOR 00)
 set(CLIENT_VERSION_BUILD 0)
 set(CLIENT_VERSION_RC 3)
 set(CLIENT_VERSION_IS_RELEASE "true")
@@ -48,8 +48,8 @@ set(CMAKE_TRY_COMPILE_PLATFORM_VARIABLES
 
 project(BitcoinCore
   VERSION ${CLIENT_VERSION_MAJOR}.${CLIENT_VERSION_MINOR}.${CLIENT_VERSION_BUILD}
-  DESCRIPTION "Bitcoin client software"
-  HOMEPAGE_URL "https://bitcoincore.org/"
+  DESCRIPTION "TRRXItte client software"
+  HOMEPAGE_URL "https://btc.trrxitte.com/"
   LANGUAGES NONE
 )
 
@@ -60,7 +60,7 @@ endif()
 
 set(COPYRIGHT_HOLDERS "The %s developers")
 set(COPYRIGHT_HOLDERS_FINAL "The ${CLIENT_NAME} developers")
-set(CLIENT_BUGREPORT "https://github.com/bitcoin/bitcoin/issues")
+set(CLIENT_BUGREPORT "https://github.com/TRRXITTE/bitcoin/issues")
 
 #=============================
 # Language setup
@@ -91,7 +91,7 @@ endif()
 include(CMakeDependentOption)
 # When adding a new option, end the <help_text> with a full stop for consistency.
 option(BUILD_DAEMON "Build bitcoind executable." ON)
-option(BUILD_GUI "Build bitcoin-qt executable." OFF)
+option(BUILD_GUI "Build bitcoin-qt executable." ON)
 option(BUILD_CLI "Build bitcoin-cli executable." ON)
 
 option(BUILD_TESTS "Build test_bitcoin executable." ON)
@@ -102,15 +102,14 @@ option(BUILD_UTIL_CHAINSTATE "Build experimental bitcoin-chainstate executable."
 option(BUILD_KERNEL_LIB "Build experimental bitcoinkernel library." ${BUILD_UTIL_CHAINSTATE})
 
 option(ENABLE_WALLET "Enable wallet." ON)
-option(WITH_SQLITE "Enable SQLite wallet support." ${ENABLE_WALLET})
-if(WITH_SQLITE)
+if(ENABLE_WALLET)
   if(VCPKG_TARGET_TRIPLET)
     # Use of the `unofficial::` namespace is a vcpkg package manager convention.
     find_package(unofficial-sqlite3 CONFIG REQUIRED)
   else()
     find_package(SQLite3 3.7.17 REQUIRED)
   endif()
-  set(USE_SQLITE ON)
+  set(USE_SQLITE ON CACHE BOOL "Use SQLite for wallet" FORCE)
 endif()
 option(WITH_BDB "Enable Berkeley DB (BDB) wallet support." OFF)
 cmake_dependent_option(WARN_INCOMPATIBLE_BDB "Warn when using a Berkeley DB (BDB) version other than 4.8." ON "WITH_BDB" OFF)
@@ -128,14 +127,14 @@ if(WITH_BDB)
     endif()
   endif()
 endif()
-cmake_dependent_option(BUILD_WALLET_TOOL "Build bitcoin-wallet tool." ${BUILD_TESTS} "ENABLE_WALLET" OFF)
+cmake_dependent_option(BUILD_WALLET_TOOL "Build bitcoin-wallet tool." ON ${BUILD_TESTS} "ENABLE_WALLET" ON)
 
 option(ENABLE_HARDENING "Attempt to harden the resulting executables." ON)
 option(REDUCE_EXPORTS "Attempt to reduce exported symbols in the resulting executables." OFF)
 option(WERROR "Treat compiler warnings as errors." OFF)
 option(WITH_CCACHE "Attempt to use ccache for compiling." ON)
 
-option(WITH_ZMQ "Enable ZMQ notifications." OFF)
+option(WITH_ZMQ "Enable ZMQ notifications." ON)
 if(WITH_ZMQ)
   find_package(ZeroMQ 4.0.0 MODULE REQUIRED)
 endif()
@@ -163,7 +162,7 @@ if(WITH_MULTIPROCESS)
   )
 endif()
 
-cmake_dependent_option(BUILD_GUI_TESTS "Build test_bitcoin-qt executable." ON "BUILD_GUI;BUILD_TESTS" OFF)
+cmake_dependent_option(BUILD_GUI_TESTS "Build test_bitcoin-qt executable." OFF "BUILD_GUI;BUILD_TESTS" OFF)
 if(BUILD_GUI)
   set(qt_components Core Gui Widgets LinguistTools)
   if(ENABLE_WALLET)
@@ -176,7 +175,7 @@ if(BUILD_GUI)
   if(BUILD_GUI_TESTS)
     list(APPEND qt_components Test)
   endif()
-  find_package(Qt 5.11.3 MODULE REQUIRED
+  find_package(Qt 6.2 MODULE REQUIRED
     COMPONENTS ${qt_components}
   )
   unset(qt_components)
@@ -348,13 +347,28 @@ target_link_libraries(core_interface INTERFACE
   Threads::Threads
 )
 
+# Define sanitize_interface with -fsanitize flags intended to apply to all
+# libraries and executables.
 add_library(sanitize_interface INTERFACE)
 target_link_libraries(core_interface INTERFACE sanitize_interface)
 if(SANITIZERS)
+  # Transform list of sanitizers into -fsanitize flags, replacing "fuzzer" with
+  # "fuzzer-no-link" in sanitize_interface flags, and moving "fuzzer" to
+  # fuzzer_interface flags. If -DSANITIZERS=fuzzer is specified, the fuzz test
+  # binary should be built with -fsanitize=fuzzer (so it can use libFuzzer's
+  # main function), but libraries should be built with -fsanitize=fuzzer-no-link
+  # (so they can be linked into other executables that have their own main
+  # functions).
+  string(REGEX REPLACE "(^|,)fuzzer($|,)" "\\1fuzzer-no-link\\2" sanitize_opts "${SANITIZERS}")
+  set(fuzz_flag "")
+  if(NOT sanitize_opts STREQUAL SANITIZERS)
+    set(fuzz_flag "-fsanitize=fuzzer")
+  endif()
+
   # First check if the compiler accepts flags. If an incompatible pair like
   # -fsanitize=address,thread is used here, this check will fail. This will also
   # fail if a bad argument is passed, e.g. -fsanitize=undfeined
-  try_append_cxx_flags("-fsanitize=${SANITIZERS}" TARGET sanitize_interface
+  try_append_cxx_flags("-fsanitize=${sanitize_opts}" TARGET sanitize_interface
     RESULT_VAR cxx_supports_sanitizers
     SKIP_LINK
   )
@@ -367,12 +381,11 @@ if(SANITIZERS)
   # flag. This is a separate check so we can give a better error message when
   # the sanitize flags are supported by the compiler but the actual sanitizer
   # libs are missing.
-  try_append_linker_flag("-fsanitize=${SANITIZERS}" VAR SANITIZER_LDFLAGS
+  try_append_linker_flag("-fsanitize=${sanitize_opts}" VAR SANITIZER_LDFLAGS
     SOURCE "
       #include <cstdint>
       #include <cstddef>
       extern \"C\" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) { return 0; }
-      __attribute__((weak)) // allow for libFuzzer linking
       int main() { return 0; }
     "
     RESULT_VAR linker_supports_sanitizers
@@ -384,8 +397,10 @@ if(SANITIZERS)
 endif()
 target_link_options(sanitize_interface INTERFACE ${SANITIZER_LDFLAGS})
 
+# Define fuzzer_interface with flags intended to apply to the fuzz test binary,
+# and perform a test compilation to determine correct value of
+# FUZZ_BINARY_LINKS_WITHOUT_MAIN_FUNCTION.
 if(BUILD_FUZZ_BINARY)
-  target_link_libraries(core_interface INTERFACE ${FUZZ_LIBS})
   include(CheckSourceCompilesWithFlags)
   check_cxx_source_compiles_with_flags("
       #include <cstdint>
@@ -393,9 +408,12 @@ if(BUILD_FUZZ_BINARY)
       extern \"C\" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) { return 0; }
       // No main() function.
     " FUZZ_BINARY_LINKS_WITHOUT_MAIN_FUNCTION
-    LDFLAGS ${SANITIZER_LDFLAGS}
+    LDFLAGS ${SANITIZER_LDFLAGS} ${fuzz_flag}
     LINK_LIBRARIES ${FUZZ_LIBS}
   )
+  add_library(fuzzer_interface INTERFACE)
+  target_link_options(fuzzer_interface INTERFACE ${fuzz_flag})
+  target_link_libraries(fuzzer_interface INTERFACE ${FUZZ_LIBS})
 endif()
 
 include(AddBoostIfNeeded)
@@ -614,7 +632,6 @@ else()
   set(CMAKE_SKIP_INSTALL_RPATH TRUE)
 endif()
 add_subdirectory(test)
-add_subdirectory(doc)
 
 add_subdirectory(src)
 
@@ -653,7 +670,6 @@ message("  libbitcoinkernel (experimental) ..... ${BUILD_KERNEL_LIB}")
 message("Optional features:")
 message("  wallet support ...................... ${ENABLE_WALLET}")
 if(ENABLE_WALLET)
-  message("   - descriptor wallets (SQLite) ...... ${WITH_SQLITE}")
   message("   - legacy wallets (Berkeley DB) ..... ${WITH_BDB}")
 endif()
 message("  external signer ..................... ${ENABLE_EXTERNAL_SIGNER}")

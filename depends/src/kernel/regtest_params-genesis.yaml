@@ -1,0 +1,11 @@
+algorithm: SHA256
+merkle hash: 6ba41ee8fe8a65e051c689e359b72a1eaad744f056deab8cfcc09134d2b3fced
+pszTimestamp: 2025-03-31 TRRXITTE Bitcoin
+pubkey: 04678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38c4f35504e51ec112de5c384df7ba0b8d578a4c702b6bf11d5f
+time: 1743436800
+bits: 0x1e0ffff0
+Searching for genesis hash...
+1519129 hash/s, estimate: 0.8 hgenesis hash found!
+nonce: 1236808
+genesis hash: 000002f9cd47750a3c9a49ec14a6b7deeb0bf849d7972a83eb91ff7eb6f96e61
+(genesis_env) traaitt@Mac GENESISH0 % 

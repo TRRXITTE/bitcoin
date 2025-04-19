@@ -1,5 +1,5 @@
 ![Download Count](https://img.shields.io/github/downloads/TRRXITTE/bitcoin/total.svg)
-![Version](https://img.shields.io/github/v/release/TRRXITTE/bitcoin)
+![Version](https://img.shields.io/github/release/TRRXITTE/bitcoin)
 ![GitHub stars](https://img.shields.io/github/stars/TRRXITTE/bitcoin?label=Github%20Stars)
 
 Bitcoin Core integration/staging tree

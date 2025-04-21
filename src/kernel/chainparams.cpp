@@ -95,13 +95,13 @@ public:
         consensus.SegwitHeight = 0;
         consensus.MinBIP9WarningHeight = 144; // Miner confirmation window
         consensus.powLimit = uint256{"00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"};
-        consensus.nPowTargetTimespan = 100;
+        consensus.nPowTargetTimespan = 1000;
         consensus.nPowTargetSpacing = 100;
         consensus.nSubsidyHalvingInterval = 0;
         consensus.fPowAllowMinDifficultyBlocks = false;
         consensus.enforce_BIP94 = false;
         consensus.fPowNoRetargeting = false;
-        consensus.nRuleChangeActivationThreshold = 1000; 
+        consensus.nRuleChangeActivationThreshold = 100; 
         consensus.nMinerConfirmationWindow = 144;  // ~hours at 60s/block
         
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;

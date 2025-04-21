@@ -101,7 +101,7 @@ public:
         consensus.fPowAllowMinDifficultyBlocks = false;
         consensus.enforce_BIP94 = false;
         consensus.fPowNoRetargeting = false;
-        consensus.nRuleChangeActivationThreshold = 100; 
+        consensus.nRuleChangeActivationThreshold = 1000; 
         consensus.nMinerConfirmationWindow = 144;  // ~hours at 60s/block
         
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;

@@ -95,7 +95,7 @@ public:
         consensus.SegwitHeight = 0;
         consensus.MinBIP9WarningHeight = 144; // Miner confirmation window
         consensus.powLimit = uint256{"00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"};
-        consensus.nPowTargetTimespan = 2 * 60 * 60;
+        consensus.nPowTargetTimespan = 100;
         consensus.nPowTargetSpacing = 100;
         consensus.nSubsidyHalvingInterval = 0;
         consensus.fPowAllowMinDifficultyBlocks = false;
